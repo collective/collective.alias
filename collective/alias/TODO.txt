@@ -1,0 +1,57 @@
+
+ [ ] Alias needs to be re-indexed when object is modified
+        - set marker on the aliased object
+        - register event handler for IObjectModifiedEvent on this marker
+        - rebroadcast IObjectModifiedEvent on alias(es)
+
+ [ ] Test collections
+ [ ] Optionally alias children
+        - allow traversal into alias - rewrap children of aliased object
+        - how can we re-index child aliases when the source changes?
+
+ [ ] Decide how to deal with comments
+
+ [ ] Text Deterity default view
+        - looks up self.context.portal_type
+        - will find alias, not aliased type
+
+ [ ] Test annotations
+        - should go to aliased object
+        - may need a custom IAnnotations adapter
+
+ [ ] Test security
+        - different workflow states/permissions
+        - different local roles
+        - different content rules
+
+ [ ] Add functional tests!
+        - Probably want to use testbrowser for most of these
+
+ [ ] Allow title override?
+ [ ] Make action (tab) merging optional? (makes little sense for collections)
+ [ ] Allow optionally showing link to original (in a viewlet?)
+ [ ] Add icon overlay
+ [ ] Add "paste as alias" action
+
+Base classes
+
+    Contained                       -- attributes, proxy
+    DefaultDublinCoreImpl           -- attributes + methods, proxy
+        PropertyManager             -- attributes + methods, proxy
+    PortalContent                   -- SearchableText, __call__(), implement!
+        DynamicType                 -- FTI methods, traversal hook, implement?
+        CMFCatalogAware             -- see below
+        SimpleItem                  -- base classes only, proxy
+            Item                    -- id, isPrincipaFolderish, proxy
+                Resource            -- ?
+                CopySource          -- copy support, implement!
+                Tabs                -- ?
+                Traversable         -- URL, traversal, implement!
+                Element             -- attributes + methods, proxy
+                Owned               -- Ownership, implement!
+                UndoSupport         -- Undo support, implement!
+            RoleManager             -- Permissions and roles, implement? [*]
+    CMFOrderedBTreeFolderBase       -- folder API, wraps, proxy
+        BTreeFolder2Base            -- folder API, wraps, proxy
+    CMFCatalogAware                 -- indexing operations, implement!
+    BrowserDefaultMixin             -- attributes + methods, proxy

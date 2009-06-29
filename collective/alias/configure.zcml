@@ -1,0 +1,42 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:grok="http://namespaces.zope.org/grok"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="collective.alias">
+
+    <include package="collective.autopermission" />
+
+    <permission
+        id="collective.alias.AddAlias"
+        title="collective.alias: Add Alias"
+        />
+
+    <browser:page
+        for="zope.app.container.interfaces.IAdding"
+        name="collective.alias.fti"
+        template="fti.pt"
+        class=".fti.FTIAddView"
+        permission="cmf.ManagePortal"
+        />
+    
+    <five:registerClass
+        class=".fti.AliasFTI"
+        meta_type="Alias FTI"
+        addview="collective.alias.fti"
+        permission="cmf.ManagePortal"
+        global="False"
+        />
+    
+    <genericsetup:registerProfile
+        name="default"
+        title="Content alias"
+        description="Adds the ability to register content aliases"
+        directory="profiles/default"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+    
+    <grok:grok package="." />
+    
+</configure>

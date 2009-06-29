@@ -1,0 +1,3 @@
+<object name="portal_types">
+    <object name="collective.alias.alias" meta_type="Alias FTI" />
+</object>
