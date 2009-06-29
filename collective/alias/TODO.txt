@@ -1,15 +1,22 @@
 
+ [ ] Decide how to link to edit form
+        - With the Alias FTI rendered useless, we can't merge the actions
+
+ [ ] Make alias more read-only
+        - Currently, it's too easy to get to an edit screen and set attributes
+          on the alias by accidenet
+        - Find a way to hide actions (e.g. edit tab)?
+        - Use __setattr__ to stop setting attributes not pre-defined?
+
  [ ] Alias needs to be re-indexed when object is modified
         - set marker on the aliased object
         - register event handler for IObjectModifiedEvent on this marker
         - rebroadcast IObjectModifiedEvent on alias(es)
 
- [ ] Test collections
  [ ] Optionally alias children
         - allow traversal into alias - rewrap children of aliased object
         - how can we re-index child aliases when the source changes?
-
- [ ] Decide how to deal with comments
+ [ ] Optionally alias comments
 
  [ ] Text Deterity default view
         - looks up self.context.portal_type
@@ -24,14 +31,19 @@
         - different local roles
         - different content rules
 
+ [ ] Disable 'display' menu
+        - or at least disallow setting a different layout
+ [ ] Disable 'add' menu
+ 
  [ ] Add functional tests!
         - Probably want to use testbrowser for most of these
 
  [ ] Allow title override?
- [ ] Make action (tab) merging optional? (makes little sense for collections)
  [ ] Allow optionally showing link to original (in a viewlet?)
  [ ] Add icon overlay
- [ ] Add "paste as alias" action
+ [ ] Implement "paste as alias" action
+ [ ] Optionally keep workflow state + permissions in sync?
+    - event driven?
 
 Base classes
 
