@@ -1,3 +1,36 @@
+collective.alias - to-do
+========================
+
+Edge cases
+----------
+ 
+ [ ] Implement folder behaviour by mixing in plone.folder
+        - Alias is folderish if the target is folderish
+        - Alias can only contain other aliases by default (?)
+        - A folder listing on an alias of a folder shows items in the alias
+            folder, using the settings and metadata of the target folder
+        - Traversal to sub-items should not delegate
+
+Testing
+-------
+
+ [ ] Test security
+        - different workflow states/permissions
+        - different local roles
+        - different content rules
+
+Performance
+-----------
+
+ [ ] Cache the alias target lookup in a _v_ attribute
+        - don't cache until we have a version with an acquisition context!
+
+ [ ] Cache the __providedBy__ decorator heavily
+        - use a _v_ attribute on the instance
+        - invalidate when the alias is modified
+
+Integration
+-----------
 
  [ ] Decide how to link to edit form
         - With the Alias FTI rendered useless, we can't merge the actions
@@ -13,30 +46,17 @@
         - register event handler for IObjectModifiedEvent on this marker
         - rebroadcast IObjectModifiedEvent on alias(es)
 
- [ ] Optionally alias children
-        - allow traversal into alias - rewrap children of aliased object
-        - how can we re-index child aliases when the source changes?
- [ ] Optionally alias comments
-
- [ ] Text Deterity default view
-        - looks up self.context.portal_type
-        - will find alias, not aliased type
-
- [ ] Test annotations
-        - should go to aliased object
-        - may need a custom IAnnotations adapter
-
- [ ] Test security
-        - different workflow states/permissions
-        - different local roles
-        - different content rules
-
  [ ] Disable 'display' menu
         - or at least disallow setting a different layout
- [ ] Disable 'add' menu
+
+Missing
+-------
  
  [ ] Add functional tests!
         - Probably want to use testbrowser for most of these
+
+New functionality
+-----------------
 
  [ ] Allow title override?
  [ ] Allow optionally showing link to original (in a viewlet?)
@@ -45,7 +65,8 @@
  [ ] Optionally keep workflow state + permissions in sync?
     - event driven?
 
-Base classes
+Content class hierarchy
+-----------------------
 
     Contained                       -- attributes, proxy
     DefaultDublinCoreImpl           -- attributes + methods, proxy

@@ -12,8 +12,11 @@ objects:
   * Permission/role map (as set by workflow)
   * Local roles
   * URL
-  * Portal type (as indexed in the portal_catalog, for example)
 
 Most other features are taken directly from the aliased object. The goal is
 that most 'view' operations at least should work identically on the alias as
 they do on the aliased object.
+
+Aliasing of folders
+--------------------
+

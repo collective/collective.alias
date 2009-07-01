@@ -9,6 +9,8 @@ from zope.interface.declarations import ObjectSpecificationDescriptor
 
 from zope.component import getUtility
 
+from zope.annotation.interfaces import IAnnotations
+
 # XXX: Should move to zope.container in the future
 from zope.app.container.interfaces import INameChooser
 from zope.app.container.contained import Contained
@@ -42,6 +44,7 @@ class IAlias(form.Schema):
             source=ObjPathSourceBinder(),
         )
 
+
 class TitleToId(grok.Adapter):
     """Implements title-to-id normalisation for aliases
     """
@@ -55,6 +58,7 @@ class TitleToId(grok.Adapter):
         if alias is None:
             return 'broken-alias'
         return alias.Title()
+
 
 class DelegatingSpecification(ObjectSpecificationDescriptor):
     """A __providedBy__ decorator that returns the interfaces provided by
@@ -75,6 +79,7 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
         
         return alias_spec + aliased.__providedBy__
 
+
 class Edit(dexterity.EditForm):
     """Override the edit form not to depend on the portal_type
     """
@@ -94,6 +99,7 @@ class Edit(dexterity.EditForm):
         trivial to override. Just ignore it. :)
         """
         pass
+
 
 class Add(dexterity.AddForm):
     """Override the add form not to depend on the portal_type once the
@@ -128,6 +134,18 @@ class Add(dexterity.AddForm):
         immediate_view = fti.immediate_view or 'view'
         self.immediate_view = "%s/%s/%s" % (container.absolute_url(), new_object.id, immediate_view,)
 
+
+@grok.implementer(IAnnotations)
+@grok.adapter(IAlias)
+def annotations(context):
+    """Delegate IAnnotations lookup to work on the aliased object directly.
+    """
+    aliased = context._target
+    if aliased is not None:
+        return IAnnotations(aliased, None)
+    return None
+
+
 class Alias(PortalContent, Contained):
     grok.implements(IAlias, IHasRelations)
     
@@ -136,8 +154,11 @@ class Alias(PortalContent, Contained):
     _alias_portal_type = None
     cmf_uid = None
     
-    # Make a few methods and properties that we've inherited delegate to 
-    # the aliased object
+    #
+    # Delegating methods
+    #
+    
+    # Title and description
     
     def Title(self):
         """Delegated title
@@ -163,12 +184,16 @@ class Alias(PortalContent, Contained):
             return ''
         return aliased.Description()
     
+    # Folderishness
+    
     @property
     def isPrincipiaFolderish(self):
         aliased = self._target
         if aliased is None:
             return 0
         return aliased.isPrincipaFolderish
+    
+    # portal_type
     
     @getproperty
     def portal_type(self):
@@ -181,6 +206,20 @@ class Alias(PortalContent, Contained):
     def portal_type(self, value):
         self._alias_portal_type = value
     
+    # discussion container
+    
+    @getproperty
+    def talkback(self):
+        aliased = self._target
+        return aq_base(aliased.talkback).__of__(self) # may legitimately raise an attirbute error
+    
+    @setproperty
+    def talkback(self, value):
+        aliased = self._target
+        if aliased is None:
+            return
+        aliased.talkback = value
+
     # Delegate anything else that we can via a __getattr__ hook
     
     def __getattr__(self, name):
@@ -210,14 +249,19 @@ class Alias(PortalContent, Contained):
             return super(Alias, self).__getattr__(name)
         
         return aliased_attr
-
+    
     # Helper to get the object with _v_ caching
     
     @property
     def _target(self):
-        aliased = getattr(self, '_v_aliased_object', None)
-        if aliased is None:
-            if self._aliased_object is None or self._aliased_object.isBroken():
-                return None
-            aliased = self._v_aliased_object = self._aliased_object.to_object
-        return aliased
+        # TODO: This causes problems sometimes with aq contexts being lost.
+        # Don't cache until we have a valid aq context.
+        # aliased = getattr(self, '_v_aliased_object', None)
+        # if aliased is None:
+        #    if self._aliased_object is None or self._aliased_object.isBroken():
+        #        return None
+        #     aliased = self._v_aliased_object = self._aliased_object.to_object
+        # return aliased
+        if self._aliased_object is None or self._aliased_object.isBroken():
+            return None
+        return self._aliased_object.to_object
