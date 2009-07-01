@@ -9,7 +9,12 @@ from zope.interface.declarations import ObjectSpecificationDescriptor
 
 from zope.component import getUtility
 
+from zope.app.component.hooks import getSite
+from zope.app.publication.interfaces import IEndRequestEvent
+
 from zope.annotation.interfaces import IAnnotations
+
+from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 
 # XXX: Should move to zope.container in the future
 from zope.app.container.interfaces import INameChooser
@@ -71,13 +76,18 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
         if inst is None:
             return getObjectSpecification(cls)
         
+        cached_spec = getattr(inst, '_v__providedBy__', None)
+        if cached_spec is not None:
+            return cached_spec
+        
         alias_spec = implementedBy(Alias)
         
         aliased = inst._target
         if aliased is None:
             return alias_spec
         
-        return alias_spec + aliased.__providedBy__
+        spec = inst._v__providedBy__ = alias_spec + aliased.__providedBy__
+        return spec
 
 
 class Edit(dexterity.EditForm):
@@ -145,6 +155,19 @@ def annotations(context):
         return IAnnotations(aliased, None)
     return None
 
+
+@grok.subscribe(IAlias, IObjectModifiedEvent)
+def clear_caches(obj, event):
+    obj._v_target = None
+    obj._v__providedBy__ = None
+
+@grok.subscribe(IEndRequestEvent)
+def clear_target_cache(event):
+    request = event.request
+    if request._held is not None:
+        for held in request._held:
+            if IAlias.providedBy(held):
+                held._v_target = None
 
 class Alias(PortalContent, Contained):
     grok.implements(IAlias, IHasRelations)
@@ -219,7 +242,7 @@ class Alias(PortalContent, Contained):
         if aliased is None:
             return
         aliased.talkback = value
-
+    
     # Delegate anything else that we can via a __getattr__ hook
     
     def __getattr__(self, name):
@@ -254,14 +277,18 @@ class Alias(PortalContent, Contained):
     
     @property
     def _target(self):
-        # TODO: This causes problems sometimes with aq contexts being lost.
-        # Don't cache until we have a valid aq context.
-        # aliased = getattr(self, '_v_aliased_object', None)
-        # if aliased is None:
-        #    if self._aliased_object is None or self._aliased_object.isBroken():
-        #        return None
-        #     aliased = self._v_aliased_object = self._aliased_object.to_object
-        # return aliased
-        if self._aliased_object is None or self._aliased_object.isBroken():
-            return None
-        return self._aliased_object.to_object
+        aliased = getattr(self, '_v_target', None)
+        if aliased is None:
+            if self._aliased_object is None or self._aliased_object.isBroken():
+                return None
+            aliased = self._v_target = self._aliased_object.to_object
+            
+            # hold this object in the request so that we can wipe the _v_
+            # variable when the request is closed. Without this, we get
+            # really insane errors with requests that don't have URLs
+            # intermittently.
+
+            request = getSite().REQUEST
+            request._hold(self)
+
+        return aliased

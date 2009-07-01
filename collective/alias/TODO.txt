@@ -1,6 +1,14 @@
 collective.alias - to-do
 ========================
 
+Testing
+-------
+
+ [ ] Test security
+        - different workflow states/permissions
+        - different local roles
+        - different content rules
+
 Edge cases
 ----------
  
@@ -11,40 +19,22 @@ Edge cases
             folder, using the settings and metadata of the target folder
         - Traversal to sub-items should not delegate
 
-Testing
--------
-
- [ ] Test security
-        - different workflow states/permissions
-        - different local roles
-        - different content rules
-
-Performance
------------
-
- [ ] Cache the alias target lookup in a _v_ attribute
-        - don't cache until we have a version with an acquisition context!
-
- [ ] Cache the __providedBy__ decorator heavily
-        - use a _v_ attribute on the instance
-        - invalidate when the alias is modified
-
 Integration
 -----------
+
+ [ ] Alias needs to be re-indexed when object is modified
+        - set marker on the aliased object
+        - register event handler for IObjectModifiedEvent on this marker
+        - rebroadcast IObjectModifiedEvent on alias(es)
 
  [ ] Decide how to link to edit form
         - With the Alias FTI rendered useless, we can't merge the actions
 
  [ ] Make alias more read-only
         - Currently, it's too easy to get to an edit screen and set attributes
-          on the alias by accidenet
+          on the alias by accident
         - Find a way to hide actions (e.g. edit tab)?
         - Use __setattr__ to stop setting attributes not pre-defined?
-
- [ ] Alias needs to be re-indexed when object is modified
-        - set marker on the aliased object
-        - register event handler for IObjectModifiedEvent on this marker
-        - rebroadcast IObjectModifiedEvent on alias(es)
 
  [ ] Disable 'display' menu
         - or at least disallow setting a different layout
@@ -64,6 +54,9 @@ New functionality
  [ ] Implement "paste as alias" action
  [ ] Optionally keep workflow state + permissions in sync?
     - event driven?
+ [ ] Optionally allow traversal to children of target
+    - do not create fake catalog entries
+    - regular folder listings won't work
 
 Content class hierarchy
 -----------------------
