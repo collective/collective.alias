@@ -1,13 +1,17 @@
 collective.alias - to-do
 ========================
 
-Testing
--------
+Bugs
+----
 
- [ ] Test security
-        - different workflow states/permissions
-        - different local roles
-        - different content rules
+  [ ] Aliasing of methods
+        - currently, we re-bind methods so that im_self is the Alias
+        - this fails on e.g. BaseObject.__getitem__(self, item)
+        - we either need to make Alias appear to subclass the same things,
+            or find a different solution based on proxies
+
+  [ ] Possible problems on catalog deletion
+        - seems we may get stale objects if either alias or target is deleted?
 
 Edge cases
 ----------

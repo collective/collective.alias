@@ -34,6 +34,7 @@ from Acquisition import aq_base, aq_inner
 from Products.CMFCore.PortalContent import PortalContent
 
 from collective.alias import MessageFactory as _
+from collective.alias.proxy import AliasProxy
 
 _marker = object()
 
@@ -61,7 +62,12 @@ class TitleToId(grok.Adapter):
     def title(self):
         alias = self.context._target
         if alias is None:
-            return 'broken-alias'
+            return 'alias'
+        
+        delegate = INameFromTitle(alias, None)
+        if delegate is not None:
+            return delegate.title
+        
         return alias.Title()
 
 
@@ -144,30 +150,6 @@ class Add(dexterity.AddForm):
         immediate_view = fti.immediate_view or 'view'
         self.immediate_view = "%s/%s/%s" % (container.absolute_url(), new_object.id, immediate_view,)
 
-
-@grok.implementer(IAnnotations)
-@grok.adapter(IAlias)
-def annotations(context):
-    """Delegate IAnnotations lookup to work on the aliased object directly.
-    """
-    aliased = context._target
-    if aliased is not None:
-        return IAnnotations(aliased, None)
-    return None
-
-
-@grok.subscribe(IAlias, IObjectModifiedEvent)
-def clear_caches(obj, event):
-    obj._v_target = None
-    obj._v__providedBy__ = None
-
-@grok.subscribe(IEndRequestEvent)
-def clear_target_cache(event):
-    request = event.request
-    if request._held is not None:
-        for held in request._held:
-            if IAlias.providedBy(held):
-                held._v_target = None
 
 class Alias(PortalContent, Contained):
     grok.implements(IAlias, IHasRelations)
@@ -252,7 +234,7 @@ class Alias(PortalContent, Contained):
         
         if name.startswith('_v_'):
             raise AttributeError(name)
-        
+                    
         # This causes all kinds of weirdness...
         if name == '__bobo_traverse__':
             return super(Alias, self).__getattr__(name)
@@ -281,14 +263,43 @@ class Alias(PortalContent, Contained):
         if aliased is None:
             if self._aliased_object is None or self._aliased_object.isBroken():
                 return None
-            aliased = self._v_target = self._aliased_object.to_object
             
-            # hold this object in the request so that we can wipe the _v_
+            # Get the object and wrap it in an AliasProxy
+            aliased = self._v_target = AliasProxy(self._aliased_object.to_object, self)
+            
+            # Hold this object in the request so that we can wipe the _v_
             # variable when the request is closed. Without this, we get
             # really insane errors with requests that don't have URLs
             # intermittently.
-
+            
             request = getSite().REQUEST
             request._hold(self)
-
+            
         return aliased
+
+
+@grok.subscribe(IAlias, IObjectModifiedEvent)
+def clear_caches(obj, event):
+    obj._v_target = None
+    obj._v__providedBy__ = None
+
+
+@grok.subscribe(IEndRequestEvent)
+def clear_target_cache(event):
+    request = event.request
+    if request._held is not None:
+        for held in request._held:
+            if IAlias.providedBy(held):
+                held._v_target = None
+
+
+@grok.implementer(IAnnotations)
+@grok.adapter(IAlias)
+def annotations(context):
+    """Delegate IAnnotations lookup to work on the aliased object directly.
+    """
+    aliased = context._target
+    if aliased is not None:
+        return IAnnotations(aliased, None)
+    return None
+
