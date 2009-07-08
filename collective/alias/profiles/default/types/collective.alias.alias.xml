@@ -12,7 +12,7 @@
  <property name="allowed_content_types" />
  
  <!-- schema interface -->
- <property name="schema">collective.alias.content.IAlias</property> 
+ <property name="schema">collective.alias.interfaces.IAlias</property> 
  
  <!-- class used for content items -->
  <property name="klass">collective.alias.content.Alias</property>

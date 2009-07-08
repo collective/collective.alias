@@ -1,7 +1,9 @@
+import types
+
 from rwproperty import getproperty, setproperty
 
 from five import grok
-from plone.directives import form, dexterity
+from plone.directives import dexterity
 
 from zope.interface.declarations import implementedBy
 from zope.interface.declarations import getObjectSpecification
@@ -20,36 +22,21 @@ from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.app.container.interfaces import INameChooser
 from zope.app.container.contained import Contained
 
-from z3c.relationfield.schema import RelationChoice
 from z3c.relationfield.interfaces import IHasRelations
 
-from plone.formwidget.contenttree import ObjPathSourceBinder
 from plone.app.content.interfaces import INameFromTitle
 
 from plone.dexterity.interfaces import IDexterityFTI
 
 from AccessControl import Unauthorized
-from Acquisition import aq_base, aq_inner
+from Acquisition import aq_base, aq_inner, aq_parent
 
 from Products.CMFCore.PortalContent import PortalContent
 
 from collective.alias import MessageFactory as _
-from collective.alias.proxy import AliasProxy
+from collective.alias.interfaces import IAlias
 
 _marker = object()
-
-class IAlias(form.Schema):
-    """Schema interface. Note that the alias will also appear to provide the
-    schema of the aliased object.
-    """
-    
-    _aliased_object = RelationChoice(
-            title=_(u"Aliased object"),
-            description=_(u"Choose an object to alias"),
-            required=True,
-            source=ObjPathSourceBinder(),
-        )
-
 
 class TitleToId(grok.Adapter):
     """Implements title-to-id normalisation for aliases
@@ -64,7 +51,7 @@ class TitleToId(grok.Adapter):
         if alias is None:
             return 'alias'
         
-        delegate = INameFromTitle(alias, None)
+        delegate = INameFromTitle(aq_inner(alias), None)
         if delegate is not None:
             return delegate.title
         
@@ -92,7 +79,7 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
         if aliased is None:
             return alias_spec
         
-        spec = inst._v__providedBy__ = alias_spec + aliased.__providedBy__
+        spec = inst._v__providedBy__ = alias_spec + aq_inner(aliased).__providedBy__
         return spec
 
 
@@ -175,7 +162,7 @@ class Alias(PortalContent, Contained):
         aliased = self._target
         if aliased is None:
             return ''
-        return aliased.Title()
+        return aq_inner(aliased).Title()
     
     @setproperty
     def title(self, value):
@@ -187,7 +174,7 @@ class Alias(PortalContent, Contained):
         aliased = self._target
         if aliased is None:
             return ''
-        return aliased.Description()
+        return aq_inner(aliased).Description()
     
     # Folderishness
     
@@ -196,7 +183,7 @@ class Alias(PortalContent, Contained):
         aliased = self._target
         if aliased is None:
             return 0
-        return aliased.isPrincipaFolderish
+        return aq_inner(aliased).isPrincipaFolderish
     
     # portal_type
     
@@ -205,7 +192,7 @@ class Alias(PortalContent, Contained):
         aliased = self._target
         if aliased is None:
             return self._alias_portal_type
-        return aliased.portal_type
+        return aq_inner(aliased).portal_type
     
     @setproperty
     def portal_type(self, value):
@@ -216,14 +203,25 @@ class Alias(PortalContent, Contained):
     @getproperty
     def talkback(self):
         aliased = self._target
-        return aq_base(aliased.talkback).__of__(self) # may legitimately raise an attirbute error
+        return aq_base(aliased.talkback).__of__(self) # may legitimately raise an attribute error
     
     @setproperty
     def talkback(self, value):
         aliased = self._target
         if aliased is None:
             return
-        aliased.talkback = value
+        aq_inner(aliased).talkback = value
+    
+    @property
+    def __class__(self):
+        """/me whistles and looks to the sky whilst walking slowly backwards,
+        hoping no-one noticed what I just did
+        """
+        aliased = self._target
+        if aliased is None:
+            return Alias
+        else:
+            return aq_base(aliased).__class__
     
     # Delegate anything else that we can via a __getattr__ hook
     
@@ -232,26 +230,38 @@ class Alias(PortalContent, Contained):
         to the aliased object
         """
         
+        # Never delegate _v_ attributes. If they're not set on the alias
+        # directly, they don't exist.
         if name.startswith('_v_'):
             raise AttributeError(name)
-                    
-        # This causes all kinds of weirdness...
-        if name == '__bobo_traverse__':
-            return super(Alias, self).__getattr__(name)
         
         aliased = self._target
+        
+        # If we don't yet have an alias, then we're out of luck
         if aliased is None:
             return super(Alias, self).__getattr__(name)
         
-        # Don't acquire
+        # Make sure we get the inner most acquisition chain (i.e. the
+        # containment chain)
+        aliased = aq_inner(aliased)
+        
+        # Avoid acquiring anything...
         if not hasattr(aq_base(aliased), name):
             return super(Alias, self).__getattr__(name)
         
-        # But get an acquisition wrapped object
+        # ... but get an acquisition wrapped object
         aliased_attr = getattr(aliased, name, _marker)
         
         if aliased_attr is _marker:
             return super(Alias, self).__getattr__(name)
+        
+        # if this is an acquisition wrapped object, re-wrap it in the alias
+        if aq_parent(aliased_attr) is aliased:
+            aliased_attr = aq_base(aliased_attr).__of__(self)
+        
+        # if it is a bound method, re-bind it so that im_self is the alias
+        if isinstance(aliased_attr, types.MethodType):
+            return types.MethodType(aliased_attr.im_func, self, type(self))
         
         return aliased_attr
     
@@ -264,8 +274,7 @@ class Alias(PortalContent, Contained):
             if self._aliased_object is None or self._aliased_object.isBroken():
                 return None
             
-            # Get the object and wrap it in an AliasProxy
-            aliased = self._v_target = AliasProxy(self._aliased_object.to_object, self)
+            aliased = self._v_target = self._aliased_object.to_object
             
             # Hold this object in the request so that we can wipe the _v_
             # variable when the request is closed. Without this, we get
@@ -300,6 +309,6 @@ def annotations(context):
     """
     aliased = context._target
     if aliased is not None:
-        return IAnnotations(aliased, None)
+        return IAnnotations(aq_inner(aliased), None)
     return None
 

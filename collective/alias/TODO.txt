@@ -1,17 +1,30 @@
 collective.alias - to-do
 ========================
 
-Bugs
-----
+Bugs/to test
+------------
 
-  [ ] Aliasing of methods
-        - currently, we re-bind methods so that im_self is the Alias
-        - this fails on e.g. BaseObject.__getitem__(self, item)
-        - we either need to make Alias appear to subclass the same things,
-            or find a different solution based on proxies
+  [ ] File content
+  
+  [x] News item images
+  
+  [x] Comments
+        - should be shared
+  
+  [x] Permissions/different workflow states
+        - permissions should be taken from the alias, not the target
 
-  [ ] Possible problems on catalog deletion
-        - seems we may get stale objects if either alias or target is deleted?
+  [x] Acquired content
+        - probably wrapped in target object now
+
+  [ ] Annotations (e.g. locks, contextual portlets)
+        - should be shared
+
+  [x] Aliasing of methods
+
+  [ ] Cataloging
+        - alias created/renamed/moved/deleted
+        - target created/renamed/moved/deleted/modified
 
 Edge cases
 ----------
@@ -32,7 +45,7 @@ Integration
         - rebroadcast IObjectModifiedEvent on alias(es)
 
  [ ] Decide how to link to edit form
-        - With the Alias FTI rendered useless, we can't merge the actions
+        - May need to customise the edit content actions viewlet
 
  [ ] Make alias more read-only
         - Currently, it's too easy to get to an edit screen and set attributes
@@ -40,7 +53,7 @@ Integration
         - Find a way to hide actions (e.g. edit tab)?
         - Use __setattr__ to stop setting attributes not pre-defined?
 
- [ ] Disable 'display' menu
+ [ ] Allow different display templates
         - or at least disallow setting a different layout
 
 Missing
