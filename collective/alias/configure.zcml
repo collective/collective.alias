@@ -6,7 +6,6 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.alias">
 
-    <include package="zope.globalrequest" />
     <include package="collective.autopermission" />
 
     <permission
