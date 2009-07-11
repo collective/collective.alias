@@ -6,13 +6,11 @@ from five import grok
 from plone.directives import dexterity
 
 from zope.interface.declarations import implementedBy
+from zope.interface.declarations import providedBy
 from zope.interface.declarations import getObjectSpecification
 from zope.interface.declarations import ObjectSpecificationDescriptor
 
 from zope.component import getUtility
-
-from zope.app.component.hooks import getSite
-from zope.app.publication.interfaces import IEndRequestEvent
 
 from zope.annotation.interfaces import IAnnotations
 
@@ -34,7 +32,9 @@ from Acquisition import aq_base, aq_inner, aq_parent
 from Products.CMFCore.PortalContent import PortalContent
 
 from collective.alias import MessageFactory as _
+
 from collective.alias.interfaces import IAlias
+from collective.alias.interfaces import IHasAlias
 
 _marker = object()
 
@@ -69,18 +69,39 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
         if inst is None:
             return getObjectSpecification(cls)
         
-        cached_spec = getattr(inst, '_v__providedBy__', None)
-        if cached_spec is not None:
-            return cached_spec
+        # Find the cached value.
+        cache = getattr(inst, '_v__providedBy__', None)
         
-        alias_spec = implementedBy(Alias)
+        # Find the data we need to know if our cache needs to be invalidated
+        provided = alias_provides = getattr(inst, '__provides__', None)
         
-        aliased = inst._target
-        if aliased is None:
-            return alias_spec
+        # See if we have a valid cache, and if so return it
+        if cache is not None:
+            cached_mtime, cached_provides, cached_provided = cache
+            
+            if (
+                inst._p_mtime == cached_mtime and 
+                alias_provides is cached_provides
+            ):
+                return cached_provided
         
-        spec = inst._v__providedBy__ = alias_spec + aq_inner(aliased).__providedBy__
-        return spec
+        # If the instance doesn't have a __provides__ attribute, get the
+        # interfaces implied by the class as a starting point.
+        if provided is None:
+            assert cls == Alias # XXX: remove
+            provided = implementedBy(cls)
+        
+        # Add the interfaces provided by the target 
+        target = aq_base(inst._target)
+        if target is None:
+            return provided # don't cache yet!
+        
+        # Add the interfaces provided by the target, but take away
+        # IHasAlias if set
+        provided += providedBy(target) - IHasAlias
+        
+        inst._v__providedBy__ = inst._p_mtime, alias_provides, provided
+        return provided
 
 
 class Edit(dexterity.EditForm):
@@ -203,7 +224,10 @@ class Alias(PortalContent, Contained):
     @getproperty
     def talkback(self):
         aliased = self._target
-        return aq_base(aliased.talkback).__of__(self) # may legitimately raise an attribute error
+        if not hasattr(aq_base(aliased), 'talkback'):
+            raise AttributeError('talkback')
+        # may legitimately raise an attribute error
+        return aq_base(aliased.talkback).__of__(self)
     
     @setproperty
     def talkback(self, value):
@@ -273,34 +297,16 @@ class Alias(PortalContent, Contained):
         if aliased is None:
             if self._aliased_object is None or self._aliased_object.isBroken():
                 return None
-            
             aliased = self._v_target = self._aliased_object.to_object
-            
-            # Hold this object in the request so that we can wipe the _v_
-            # variable when the request is closed. Without this, we get
-            # really insane errors with requests that don't have URLs
-            # intermittently.
-            
-            request = getSite().REQUEST
-            request._hold(self)
             
         return aliased
 
 
+@grok.subscribe(IHasAlias, IObjectModifiedEvent)
 @grok.subscribe(IAlias, IObjectModifiedEvent)
 def clear_caches(obj, event):
     obj._v_target = None
     obj._v__providedBy__ = None
-
-
-@grok.subscribe(IEndRequestEvent)
-def clear_target_cache(event):
-    request = event.request
-    if request._held is not None:
-        for held in request._held:
-            if IAlias.providedBy(held):
-                held._v_target = None
-
 
 @grok.implementer(IAnnotations)
 @grok.adapter(IAlias)

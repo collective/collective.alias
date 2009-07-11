@@ -9,13 +9,23 @@ The following features apply to the alias and are distinct from the aliased
 objects:
 
   * Workflow state
-  * Permission/role map (as set by workflow)
+  * Permission/role map (e.g. as set by workflow)
   * Local roles
   * URL
 
 Most other features are taken directly from the aliased object. The goal is
 that most 'view' operations at least should work identically on the alias as
 they do on the aliased object.
+
+Modifying the alias
+--------------------
+
+
+
+Alias folder behaviour
+----------------------
+
+
 
 Alias-and-acquisition precedence rules
 --------------------------------------
@@ -37,7 +47,3 @@ The precedence rules for how this works are as follows:
      the alias.
      
   4) Finally, any other attributes will be acquired from the alias.
-
-Aliasing of folders
---------------------
-

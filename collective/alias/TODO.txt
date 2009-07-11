@@ -4,9 +4,16 @@ collective.alias - to-do
 Bugs/to test
 ------------
 
-  [ ] File content
+  [x] File content
+
+  [x] Image content
+        - including thumbnails in folder_summary_view
   
   [x] News item images
+  
+  [x] Folder content
+        - should retain settings of target
+        - should not show children of target
   
   [x] Comments
         - should be shared
@@ -15,17 +22,19 @@ Bugs/to test
         - permissions should be taken from the alias, not the target
 
   [x] Acquired content
-        - probably wrapped in target object now
+        - probably wrapped in target object
 
-  [ ] Annotations (e.g. locks, contextual portlets)
+  [x] Annotations (e.g. locks, contextual portlets)
         - should be shared
 
   [x] Aliasing of methods
 
-  [ ] Cataloging
+  [x] Cataloging of alias
         - alias created/renamed/moved/deleted
-        - target created/renamed/moved/deleted/modified
 
+  [ ] Cataloging when target changed
+        - target created/renamed/moved/deleted/modified
+  
 Edge cases
 ----------
  
@@ -44,22 +53,30 @@ Integration
         - register event handler for IObjectModifiedEvent on this marker
         - rebroadcast IObjectModifiedEvent on alias(es)
 
- [ ] Decide how to link to edit form
-        - May need to customise the edit content actions viewlet
+ [ ] Decide how to link to alias edit form
+        - and not to target edit form
+        - may need to customise the edit content actions viewlet
 
  [ ] Make alias more read-only
-        - Currently, it's too easy to get to an edit screen and set attributes
+        - currently, it's too easy to get to an edit screen and set attributes
           on the alias by accident
-        - Find a way to hide actions (e.g. edit tab)?
-        - Use __setattr__ to stop setting attributes not pre-defined?
+        - find a way to hide actions (e.g. edit tab)?
+        - disallow portlet management
+        - use __setattr__ to stop setting attributes not pre-defined?
+
+ [ ] Handle aliases of aliases
+        - need to find underlying target object and adjust relation 
+          accordingly
 
  [ ] Allow different display templates
-        - or at least disallow setting a different layout
+        - default to whatever the display template on the target was
+        - allow override via 'display' menu
+        - also allow setting default page (not defaulted)
 
 Missing
 -------
  
- [ ] Add functional tests!
+ [ ] Add integration/functional tests!
         - Probably want to use testbrowser for most of these
 
 New functionality
@@ -67,13 +84,14 @@ New functionality
 
  [ ] Allow title override?
  [ ] Allow optionally showing link to original (in a viewlet?)
- [ ] Add icon overlay
+ [ ] Add optional icon overlay
  [ ] Implement "paste as alias" action
  [ ] Optionally keep workflow state + permissions in sync?
-    - event driven?
+        - set marker interface on source
+        - register event handler
  [ ] Optionally allow traversal to children of target
-    - do not create fake catalog entries
-    - regular folder listings won't work
+        - do not create fake catalog entries
+        - regular folder listings won't work
 
 Content class hierarchy
 -----------------------

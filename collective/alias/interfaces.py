@@ -1,3 +1,4 @@
+from zope.interface import Interface
 from plone.directives import form
 
 from z3c.relationfield.schema import RelationChoice
@@ -16,3 +17,18 @@ class IAlias(form.Schema):
             required=True,
             source=ObjPathSourceBinder(),
         )
+
+class IHasAlias(Interface):
+    """Marker interface set on content that has an alias somewhere.
+    """
+
+class IAliasInformation(Interface):
+    """Adapt an object that has an alias to this interface to get alias
+    information.
+    """
+    
+    def find_aliases(interface=IAlias):
+        """Return a generator of objects representing aliases of the
+        context. The target will provide the interface specified in
+        'Interface'.
+        """
