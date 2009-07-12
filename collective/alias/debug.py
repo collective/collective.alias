@@ -1,7 +1,7 @@
 from five import grok
 from zope.interface import Interface
 
-class DebugView(grok.View):
+class DebugView(grok.CodeView):
     grok.name('debug')
     grok.context(Interface)
     

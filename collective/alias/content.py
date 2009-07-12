@@ -308,6 +308,7 @@ def clear_caches(obj, event):
     obj._v_target = None
     obj._v__providedBy__ = None
 
+
 @grok.implementer(IAnnotations)
 @grok.adapter(IAlias)
 def annotations(context):
