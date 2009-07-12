@@ -35,9 +35,41 @@ Bugs/to test
   [ ] Cataloging when target changed
         - target created/renamed/moved/deleted/modified
   
-Edge cases
-----------
- 
+  [ ] Target moved
+  
+  [ ] Target copied
+  
+  [ ] Alias moved
+  
+  [ ] Alias copied
+  
+  [ ] Name chooser uses same rules as target
+        - e.g. file content should use filename, not title-to-id
+  
+Integration
+-----------
+
+ [ ] Add "paste as alias" action
+
+ [ ] Disallow editing the target relation on the add form
+        - better to delete the alias and start again!
+
+ [ ] Allow different display templates
+        - default to whatever the display template on the target was
+        - allow override via 'display' menu
+        - also allow setting default page (not defaulted)
+
+ [ ] Provide link to alias edit form
+        - and not to target edit form
+        - may need to customise the edit content actions viewlet
+
+ [ ] Make alias more read-only
+        - currently, it's too easy to get to an edit screen and set attributes
+          on the alias by accident
+        - find a way to hide actions (e.g. edit tab)
+        - disallow portlet management
+        - use __setattr__ to stop setting attributes not pre-defined?
+
  [ ] Implement folder behaviour by mixing in plone.folder
         - Alias is folderish if the target is folderish
         - Alias can only contain other aliases by default (?)
@@ -45,48 +77,18 @@ Edge cases
             folder, using the settings and metadata of the target folder
         - Traversal to sub-items should not delegate
 
-Integration
------------
-
- [ ] Alias needs to be re-indexed when object is modified
-        - set marker on the aliased object
-        - register event handler for IObjectModifiedEvent on this marker
-        - rebroadcast IObjectModifiedEvent on alias(es)
-
- [ ] Decide how to link to alias edit form
-        - and not to target edit form
-        - may need to customise the edit content actions viewlet
-
- [ ] Make alias more read-only
-        - currently, it's too easy to get to an edit screen and set attributes
-          on the alias by accident
-        - find a way to hide actions (e.g. edit tab)?
-        - disallow portlet management
-        - use __setattr__ to stop setting attributes not pre-defined?
-
- [ ] Handle aliases of aliases
-        - need to find underlying target object and adjust relation 
-          accordingly
-
- [ ] Allow different display templates
-        - default to whatever the display template on the target was
-        - allow override via 'display' menu
-        - also allow setting default page (not defaulted)
-
 Missing
 -------
  
  [ ] Add integration/functional tests!
-        - Probably want to use testbrowser for most of these
 
-New functionality
------------------
+Possible future functionality
+-----------------------------
 
- [ ] Allow title override?
+ [ ] Allow title override
  [ ] Allow optionally showing link to original (in a viewlet?)
  [ ] Add optional icon overlay
- [ ] Implement "paste as alias" action
- [ ] Optionally keep workflow state + permissions in sync?
+ [ ] Optionally keep workflow state + permissions in sync
         - set marker interface on source
         - register event handler
  [ ] Optionally allow traversal to children of target

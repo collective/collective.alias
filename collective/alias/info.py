@@ -2,7 +2,7 @@ import logging
 
 from zope.component import queryUtility
 
-from zope.intid import IIntIds
+from zope.intid.interfaces import IIntIds
 from zc.relation.interfaces import ICatalog
 
 from five import grok
@@ -17,7 +17,20 @@ class AliasInformation(grok.Adapter):
     grok.implements(IAliasInformation)
     grok.context(IHasAlias)
     
-    def find_aliases(self, interface=IAlias):
+    def findAliases(self, interface=IAlias):
+        
+        intids = queryUtility(IIntIds)
+        for intid in self.findAliasIds(interface):
+            
+            # Note: from_object gets a non-aq-wrapped object, so we look it
+            # up like this
+    
+            try:
+                yield intids.getObject(intid)
+            except KeyError:
+                logger.alias('Invalid alias relationship: from_id %s does not exist' % intid)
+    
+    def findAliasIds(self, interface=IAlias):
         
         catalog = queryUtility(ICatalog)
         if catalog is None:
@@ -35,10 +48,4 @@ class AliasInformation(grok.Adapter):
             'from_attribute': '_aliased_object',
         }):
             
-            # XXX: from_object gets a non-aq-wrapped object, so we look it
-            # up like this
-
-            try:
-                yield intids.getObject(rel.from_id)
-            except KeyError:
-                logger.alias('Invalid alias relationship: from_id %s does not exist' % rel.from_id)
+            yield rel.from_id

@@ -18,17 +18,25 @@ class IAlias(form.Schema):
             source=ObjPathSourceBinder(),
         )
 
+
 class IHasAlias(Interface):
     """Marker interface set on content that has an alias somewhere.
     """
+
 
 class IAliasInformation(Interface):
     """Adapt an object that has an alias to this interface to get alias
     information.
     """
     
-    def find_aliases(interface=IAlias):
+    def findAliases(interface=IAlias):
         """Return a generator of objects representing aliases of the
-        context. The target will provide the interface specified in
-        'Interface'.
+        context. The alias will provide the interface specified in
+        'interface'.
+        """
+    
+    def findAliasIds(interface=IAlias):
+        """Return a generator of alias intids representing aliases of the
+        context. The alias will provide the interface specified in
+        'interface'.
         """

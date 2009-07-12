@@ -1,3 +1,4 @@
+import logging
 import types
 
 from rwproperty import getproperty, setproperty
@@ -5,26 +6,42 @@ from rwproperty import getproperty, setproperty
 from five import grok
 from plone.directives import dexterity
 
+from zope.interface import alsoProvides
+from zope.interface import noLongerProvides
+
 from zope.interface.declarations import implementedBy
 from zope.interface.declarations import providedBy
 from zope.interface.declarations import getObjectSpecification
 from zope.interface.declarations import ObjectSpecificationDescriptor
 
 from zope.component import getUtility
+from zope.component import queryUtility
+
+from zope.event import notify
 
 from zope.annotation.interfaces import IAnnotations
 
+from zope.lifecycleevent.interfaces import IObjectCreatedEvent
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
+from zope.lifecycleevent import ObjectModifiedEvent
 
 # XXX: Should move to zope.container in the future
+from zope.app.container.interfaces import IObjectAddedEvent
+from zope.app.container.interfaces import IObjectRemovedEvent
+
 from zope.app.container.interfaces import INameChooser
 from zope.app.container.contained import Contained
 
+from zope.intid.interfaces import IIntIds
+from zc.relation.interfaces import ICatalog
+
 from z3c.relationfield.interfaces import IHasRelations
+from z3c.relationfield.relation import RelationValue
 
 from plone.app.content.interfaces import INameFromTitle
 
 from plone.dexterity.interfaces import IDexterityFTI
+from plone.dexterity.interfaces import IDexterityContent
 
 from AccessControl import Unauthorized
 from Acquisition import aq_base, aq_inner, aq_parent
@@ -35,8 +52,11 @@ from collective.alias import MessageFactory as _
 
 from collective.alias.interfaces import IAlias
 from collective.alias.interfaces import IHasAlias
+from collective.alias.interfaces import IAliasInformation
 
 _marker = object()
+
+logger = logging.getLogger('collective.alias')
 
 class TitleToId(grok.Adapter):
     """Implements title-to-id normalisation for aliases
@@ -160,7 +180,7 @@ class Add(dexterity.AddForm):
 
 
 class Alias(PortalContent, Contained):
-    grok.implements(IAlias, IHasRelations)
+    grok.implements(IAlias, IDexterityContent, IHasRelations)
     
     __providedBy__ = DelegatingSpecification()
     _aliased_object = None
@@ -302,13 +322,6 @@ class Alias(PortalContent, Contained):
         return aliased
 
 
-@grok.subscribe(IHasAlias, IObjectModifiedEvent)
-@grok.subscribe(IAlias, IObjectModifiedEvent)
-def clear_caches(obj, event):
-    obj._v_target = None
-    obj._v__providedBy__ = None
-
-
 @grok.implementer(IAnnotations)
 @grok.adapter(IAlias)
 def annotations(context):
@@ -319,3 +332,91 @@ def annotations(context):
         return IAnnotations(aq_inner(aliased), None)
     return None
 
+
+@grok.subscribe(IHasAlias, IObjectModifiedEvent)
+@grok.subscribe(IAlias, IObjectModifiedEvent)
+def clearCaches(obj, event):
+    obj._v_target = None
+    obj._v__providedBy__ = None
+
+
+@grok.subscribe(IAlias, IObjectCreatedEvent)
+def resolveTransitiveAlias(alias, event):
+    """When an alias is created, check to see if it is pointing to another
+    alias and resolve the reference to the underlying target.
+    """
+        
+    target = aq_inner(alias._target)
+    if target is None:
+        return
+    
+    counter = 0
+    
+    while IAlias.providedBy(target) and counter < 1000: # avoid infinite loop
+        target = aq_inner(target._target)
+        counter += 1
+    
+    if counter > 0:
+        intids = queryUtility(IIntIds)
+        
+        if intids is None:
+            raise LookupError("Cannot find intid utility")
+        
+        to_id = intids.getId(target) # may raise KeyError
+        alias._aliased_object = RelationValue(to_id)
+        alias._v_target = None
+
+@grok.subscribe(IHasAlias, IObjectModifiedEvent)
+def rebroadcastModifiedEvent(obj, event):
+    """When an object with an alias is modified, consider the alias modified
+    as well. This will e.g. 
+    """
+    info = IAliasInformation(obj, None)
+    if info is not None:
+        for alias in info.findAliases():
+            new_event = ObjectModifiedEvent(alias, *event.descriptions)
+            notify(new_event)
+
+
+# Manage the IHasAlias marker
+
+@grok.subscribe(IAlias, IObjectAddedEvent)
+def markTargetOnAdd(alias, event):
+    """When the alias is added, mark the target with IHasAlias
+    """
+    
+    target = aq_inner(alias._target)
+    if target is not None and not IHasAlias.providedBy(target):
+        alsoProvides(target, IHasAlias)
+
+
+@grok.subscribe(IAlias, IObjectRemovedEvent)
+def unmarkTargetOnRemove(alias, event):
+    """When the alias is created, 
+    """
+    target = aq_inner(alias._target)
+    if target is not None and IHasAlias.providedBy(target):
+        
+        intids = queryUtility(IIntIds)
+        catalog = queryUtility(ICatalog)
+        
+        if intids is not None and catalog is not None:
+            
+            try:
+                to_id = intids.getId(target)
+            except KeyError:
+                logging.error("Alias target %s does not have an intid" % target)
+                return
+            
+            alias_base = aq_base(alias)
+            
+            for rel in catalog.findRelations({
+                'to_id': to_id,
+                'from_interfaces_flattened': IAlias,
+                'from_attribute': '_aliased_object',
+            }):
+                # abort if there is another alias
+                if alias_base is not rel.from_object:
+                    return
+        
+        noLongerProvides(target, IHasAlias)
