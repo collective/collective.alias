@@ -21,7 +21,6 @@ from zope.event import notify
 
 from zope.annotation.interfaces import IAnnotations
 
-from zope.lifecycleevent.interfaces import IObjectCreatedEvent
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.lifecycleevent import ObjectModifiedEvent
 
@@ -36,6 +35,7 @@ from zope.intid.interfaces import IIntIds
 from zc.relation.interfaces import ICatalog
 
 from z3c.relationfield.interfaces import IHasRelations
+from z3c.relationfield.interfaces import IRelationValue
 from z3c.relationfield.relation import RelationValue
 
 from plone.app.content.interfaces import INameFromTitle
@@ -143,6 +143,13 @@ class Edit(dexterity.EditForm):
         trivial to override. Just ignore it. :)
         """
         pass
+    
+    def updateFields(self):
+        super(Edit, self).updateFields()
+        
+        # Don't allow the alias to be edited - it causes all kinds of confusion
+        if '_aliased_object' in self.fields:
+            del self.fields['_aliased_object']
 
 
 class Add(dexterity.AddForm):
@@ -183,7 +190,6 @@ class Alias(PortalContent, Contained):
     grok.implements(IAlias, IDexterityContent, IHasRelations)
     
     __providedBy__ = DelegatingSpecification()
-    _aliased_object = None
     _alias_portal_type = None
     cmf_uid = None
     
@@ -309,6 +315,38 @@ class Alias(PortalContent, Contained):
         
         return aliased_attr
     
+    # ensure _aliased_object is readonly once set
+
+    @getproperty
+    def _aliased_object(self):
+        return self.__dict__.get('_aliased_object', None)
+    
+    @setproperty
+    def _aliased_object(self, value):
+        if '_aliased_object' in self.__dict__:
+            raise AttributeError("Cannot set _aliased_object more than once")
+        
+        if not IRelationValue.providedBy(value):
+            raise AttributeError("_aliased_object must be an IRelationField")
+        
+        counter = 0
+        
+        target = value.to_object
+        while IAlias.providedBy(target) and counter < 1000: # avoid infinite loop
+            target = aq_inner(target._target)
+            counter += 1
+        
+        if counter > 0:
+            intids = queryUtility(IIntIds)
+            
+            if intids is None:
+                raise LookupError("Cannot find intid utility")
+            
+            to_id = intids.getId(target)
+            value = RelationValue(to_id)
+        
+        self.__dict__['_aliased_object'] = value
+    
     # Helper to get the object with _v_ caching
     
     @property
@@ -339,32 +377,6 @@ def clearCaches(obj, event):
     obj._v_target = None
     obj._v__providedBy__ = None
 
-
-@grok.subscribe(IAlias, IObjectCreatedEvent)
-def resolveTransitiveAlias(alias, event):
-    """When an alias is created, check to see if it is pointing to another
-    alias and resolve the reference to the underlying target.
-    """
-        
-    target = aq_inner(alias._target)
-    if target is None:
-        return
-    
-    counter = 0
-    
-    while IAlias.providedBy(target) and counter < 1000: # avoid infinite loop
-        target = aq_inner(target._target)
-        counter += 1
-    
-    if counter > 0:
-        intids = queryUtility(IIntIds)
-        
-        if intids is None:
-            raise LookupError("Cannot find intid utility")
-        
-        to_id = intids.getId(target) # may raise KeyError
-        alias._aliased_object = RelationValue(to_id)
-        alias._v_target = None
 
 @grok.subscribe(IHasAlias, IObjectModifiedEvent)
 def rebroadcastModifiedEvent(obj, event):

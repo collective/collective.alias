@@ -51,9 +51,6 @@ Integration
 
  [ ] Add "paste as alias" action
 
- [ ] Disallow editing the target relation on the add form
-        - better to delete the alias and start again!
-
  [ ] Allow different display templates
         - default to whatever the display template on the target was
         - allow override via 'display' menu
