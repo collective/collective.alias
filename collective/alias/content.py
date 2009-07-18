@@ -4,55 +4,32 @@ import types
 from rwproperty import getproperty, setproperty
 
 from five import grok
-from plone.directives import dexterity
-
-from zope.interface import alsoProvides
-from zope.interface import noLongerProvides
 
 from zope.interface.declarations import implementedBy
 from zope.interface.declarations import providedBy
 from zope.interface.declarations import getObjectSpecification
 from zope.interface.declarations import ObjectSpecificationDescriptor
 
-from zope.component import getUtility
 from zope.component import queryUtility
 
-from zope.event import notify
-
-from zope.annotation.interfaces import IAnnotations
-
-from zope.lifecycleevent.interfaces import IObjectModifiedEvent
-from zope.lifecycleevent import ObjectModifiedEvent
-
-# XXX: Should move to zope.container in the future
-from zope.app.container.interfaces import IObjectAddedEvent
-from zope.app.container.interfaces import IObjectRemovedEvent
-
-from zope.app.container.interfaces import INameChooser
 from zope.app.container.contained import Contained
 
+from zope.lifecycleevent.interfaces import IObjectModifiedEvent
+
 from zope.intid.interfaces import IIntIds
-from zc.relation.interfaces import ICatalog
 
 from z3c.relationfield.interfaces import IHasRelations
 from z3c.relationfield.interfaces import IRelationValue
 from z3c.relationfield.relation import RelationValue
 
 from plone.app.content.interfaces import INameFromTitle
-
-from plone.dexterity.interfaces import IDexterityFTI
 from plone.dexterity.interfaces import IDexterityContent
 
-from AccessControl import Unauthorized
 from Acquisition import aq_base, aq_inner, aq_parent
-
 from Products.CMFCore.PortalContent import PortalContent
-
-from collective.alias import MessageFactory as _
 
 from collective.alias.interfaces import IAlias
 from collective.alias.interfaces import IHasAlias
-from collective.alias.interfaces import IAliasInformation
 
 _marker = object()
 
@@ -122,68 +99,6 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
         
         inst._v__providedBy__ = inst._p_mtime, alias_provides, provided
         return provided
-
-
-class Edit(dexterity.EditForm):
-    """Override the edit form not to depend on the portal_type
-    """
-    
-    grok.context(IAlias)
-    grok.name('edit')
-    
-    label = _(u"Edit alias")
-    
-    @getproperty
-    def portal_type(self):
-        return self.context._alias_portal_type
-    
-    @setproperty
-    def portal_type(self, value):
-        """Evil hack. The base class tries to set this in a way that's not
-        trivial to override. Just ignore it. :)
-        """
-        pass
-    
-    def updateFields(self):
-        super(Edit, self).updateFields()
-        
-        # Don't allow the alias to be edited - it causes all kinds of confusion
-        if '_aliased_object' in self.fields:
-            del self.fields['_aliased_object']
-
-
-class Add(dexterity.AddForm):
-    """Override the add form not to depend on the portal_type once the
-    object has been created.
-    """
-    
-    grok.name('collective.alias.alias')
-    
-    def add(self, object):
-        
-        fti = getUtility(IDexterityFTI, name=self.portal_type)
-        container = aq_inner(self.context)
-        container = aq_inner(container)
-        
-        container_fti = container.getTypeInfo()
-        
-        if not fti.isConstructionAllowed(container):
-            raise Unauthorized("Cannot create %s" % self.portal_type)
-        
-        if container_fti is not None and not container_fti.allowType(self.portal_type):
-            raise ValueError("Disallowed subobject type: %s" % self.portal_type)
-        
-        name = INameChooser(container).chooseName(None, object)
-        object.id = name
-        
-        new_name = container._setObject(name, object)
-        
-        # XXX: When we move to CMF 2.2, an event handler will take care of this
-        new_object = container._getOb(new_name)
-        new_object.notifyWorkflowCreated()
-        
-        immediate_view = fti.immediate_view or 'view'
-        self.immediate_view = "%s/%s/%s" % (container.absolute_url(), new_object.id, immediate_view,)
 
 
 class Alias(PortalContent, Contained):
@@ -316,7 +231,7 @@ class Alias(PortalContent, Contained):
         return aliased_attr
     
     # ensure _aliased_object is readonly once set
-
+    
     @getproperty
     def _aliased_object(self):
         return self.__dict__.get('_aliased_object', None)
@@ -360,75 +275,7 @@ class Alias(PortalContent, Contained):
         return aliased
 
 
-@grok.implementer(IAnnotations)
-@grok.adapter(IAlias)
-def annotations(context):
-    """Delegate IAnnotations lookup to work on the aliased object directly.
-    """
-    aliased = context._target
-    if aliased is not None:
-        return IAnnotations(aq_inner(aliased), None)
-    return None
-
-
-@grok.subscribe(IHasAlias, IObjectModifiedEvent)
 @grok.subscribe(IAlias, IObjectModifiedEvent)
 def clearCaches(obj, event):
     obj._v_target = None
     obj._v__providedBy__ = None
-
-
-@grok.subscribe(IHasAlias, IObjectModifiedEvent)
-def rebroadcastModifiedEvent(obj, event):
-    """When an object with an alias is modified, consider the alias modified
-    as well. This will e.g. 
-    """
-    info = IAliasInformation(obj, None)
-    if info is not None:
-        for alias in info.findAliases():
-            new_event = ObjectModifiedEvent(alias, *event.descriptions)
-            notify(new_event)
-
-
-# Manage the IHasAlias marker
-
-@grok.subscribe(IAlias, IObjectAddedEvent)
-def markTargetOnAdd(alias, event):
-    """When the alias is added, mark the target with IHasAlias
-    """
-    
-    target = aq_inner(alias._target)
-    if target is not None and not IHasAlias.providedBy(target):
-        alsoProvides(target, IHasAlias)
-
-
-@grok.subscribe(IAlias, IObjectRemovedEvent)
-def unmarkTargetOnRemove(alias, event):
-    """When the alias is created, 
-    """
-    target = aq_inner(alias._target)
-    if target is not None and IHasAlias.providedBy(target):
-        
-        intids = queryUtility(IIntIds)
-        catalog = queryUtility(ICatalog)
-        
-        if intids is not None and catalog is not None:
-            
-            try:
-                to_id = intids.getId(target)
-            except KeyError:
-                logging.error("Alias target %s does not have an intid" % target)
-                return
-            
-            alias_base = aq_base(alias)
-            
-            for rel in catalog.findRelations({
-                'to_id': to_id,
-                'from_interfaces_flattened': IAlias,
-                'from_attribute': '_aliased_object',
-            }):
-                # abort if there is another alias
-                if alias_base is not rel.from_object:
-                    return
-        
-        noLongerProvides(target, IHasAlias)
