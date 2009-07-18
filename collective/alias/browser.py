@@ -63,7 +63,13 @@ class Add(dexterity.AddForm):
         if container_fti is not None and not container_fti.allowType(self.portal_type):
             raise ValueError("Disallowed subobject type: %s" % self.portal_type)
         
-        name = INameChooser(container).chooseName(None, object)
+        
+        target = aq_inner(object._target)
+        name = None
+        if target is not None:
+            name = target.getId()
+        
+        name = INameChooser(container).chooseName(name, object)
         object.id = name
         
         new_name = container._setObject(name, object)

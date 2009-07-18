@@ -22,7 +22,6 @@ from z3c.relationfield.interfaces import IHasRelations
 from z3c.relationfield.interfaces import IRelationValue
 from z3c.relationfield.relation import RelationValue
 
-from plone.app.content.interfaces import INameFromTitle
 from plone.dexterity.interfaces import IDexterityContent
 
 from Acquisition import aq_base, aq_inner, aq_parent
@@ -34,26 +33,6 @@ from collective.alias.interfaces import IHasAlias
 _marker = object()
 
 logger = logging.getLogger('collective.alias')
-
-class TitleToId(grok.Adapter):
-    """Implements title-to-id normalisation for aliases
-    """
-    
-    grok.implements(INameFromTitle)
-    grok.context(IAlias)
-    
-    @property
-    def title(self):
-        alias = self.context._target
-        if alias is None:
-            return 'alias'
-        
-        delegate = INameFromTitle(aq_inner(alias), None)
-        if delegate is not None:
-            return delegate.title
-        
-        return alias.Title()
-
 
 class DelegatingSpecification(ObjectSpecificationDescriptor):
     """A __providedBy__ decorator that returns the interfaces provided by
@@ -107,6 +86,9 @@ class Alias(PortalContent, Contained):
     __providedBy__ = DelegatingSpecification()
     _alias_portal_type = None
     cmf_uid = None
+    
+    # to make debugging easier
+    isAlias = True
     
     #
     # Delegating methods

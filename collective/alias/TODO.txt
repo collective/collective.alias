@@ -37,7 +37,7 @@ Bugs/to test
   
   [x] Target moved
   
-  [ ] Target copied
+  [x] Target copied
         - alias should point to original
         - IHasAlias should not be set
     
@@ -45,14 +45,15 @@ Bugs/to test
         - all aliases should be removed as well
         - causes error in z3c.relationfield!
   
-  [ ] Alias moved
+  [x] Alias moved
   
-  [ ] Alias copied
+  [x] Alias copied
   
   [x] Alias removed
   
-  [ ] Name chooser uses same rules as target
-        - e.g. file content should use filename, not title-to-id
+  [x] Name chooser
+        - should be based on target id
+        - must not create naming conflicts
   
 Integration
 -----------
