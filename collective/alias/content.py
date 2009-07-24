@@ -24,8 +24,12 @@ from z3c.relationfield.relation import RelationValue
 
 from plone.dexterity.interfaces import IDexterityContent
 
+from plone.folder.ordered import CMFOrderedBTreeFolderBase
+
 from Acquisition import aq_base, aq_inner, aq_parent
+
 from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 
 from collective.alias.interfaces import IAlias
 from collective.alias.interfaces import IHasAlias
@@ -80,7 +84,7 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
         return provided
 
 
-class Alias(PortalContent, Contained):
+class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained):
     grok.implements(IAlias, IDexterityContent, IHasRelations)
     
     __providedBy__ = DelegatingSpecification()
@@ -89,6 +93,11 @@ class Alias(PortalContent, Contained):
     
     # to make debugging easier
     isAlias = True
+    
+    def __init__(self, id=None, **kwargs):
+        CMFOrderedBTreeFolderBase.__init__(self, id, **kwargs)
+        if id is not None:
+            self.id = id
     
     #
     # Delegating methods
@@ -127,7 +136,81 @@ class Alias(PortalContent, Contained):
         aliased = self._target
         if aliased is None:
             return 0
-        return aq_inner(aliased).isPrincipaFolderish
+        return aq_inner(aliased).isPrincipiaFolderish
+    
+    # def _getOb(self, id, default=_marker):
+    #     """ Return the named object from the folder. """
+    #     try:
+    #         return BTreeFolder2Base._getOb(id, default)
+    #     except KeyError, e:
+    #         raise AttributeError(e)
+    # 
+    # def _setOb(self, id, object):
+    #     """ Store the named object in the folder. """
+    #     # Set __name__ and __parent__ if the object supports it
+    #     if ILocation.providedBy(object):
+    #         if not IContained.providedBy(object):
+    #             alsoProvides(object, IContained)
+    #         oldname = getattr(object, '__name__', None)
+    #         oldparent = getattr(object, '__parent__', None)
+    #         if id is not oldname:
+    #             object.__name__ = id
+    #         if self is not oldparent:
+    #             object.__parent__ = self
+    #     BTreeFolder2Base._setOb(id, object)
+    #     IOrdering(self).notifyAdded(id)     # notify the ordering adapter
+    # 
+    # def _delOb(self, id):
+    #     """ Remove the named object from the folder. """
+    #     # Unset __parent__ and __name__ prior to removing the object.
+    #     # Note that there is a slight discrepancy with the Zope 3 behaviour
+    #     # here: we do this before the IObjectRemovedEvent is fired. In
+    #     # zope.container, IObjectRemovedEvent is fired before the object is
+    #     # actually deleted and this information is unset. In Zope2's OFS,
+    #     # there's a different IObjectWillBeRemovedEvent that is fired first,
+    #     # then the object is removed, and then IObjectRemovedEvent is fired.
+    #     try:
+    #         obj = self._getOb(id, _marker)
+    #         if obj is not _marker:
+    #             if IContained.providedBy(obj):
+    #                 obj.__parent__ = None
+    #                 obj.__name__ = None
+    #     except AttributeError:
+    #         pass        # No need to fail if we can't set these
+    #     super(OrderedBTreeFolderBase, self)._delOb(id)
+    #     IOrdering(self).notifyRemoved(id)   # notify the ordering adapter
+    # 
+    # def objectIds(self, spec=None, ordered=True):
+    #     if not ordered:
+    #         return super(OrderedBTreeFolderBase, self).objectIds(spec)
+    #     ordering = IOrdering(self)
+    #     if spec is None:
+    #         return ordering.idsInOrder()
+    #     else:
+    #         ids = super(OrderedBTreeFolderBase, self).objectIds(spec)
+    #         idxs = []
+    #         for id in ids:
+    #             idxs.append((ordering.getObjectPosition(id), id))
+    #         return [x[1] for x in sorted(idxs, key=lambda a: a[0])]
+    # 
+    # def manage_renameObject(self, id, new_id, REQUEST=None):
+    #     """ Rename a particular sub-object without changing its position. """
+    #     old_position = self.getObjectPosition(id)
+    #     result = super(OrderedBTreeFolderBase, self).manage_renameObject(id,
+    #         new_id, REQUEST)
+    #     if old_position is None:
+    #         return result
+    #     self.moveObjectToPosition(new_id, old_position, suppress_events=True)
+    #     reindex = getattr(self._getOb(new_id), 'reindexObject', None)
+    #     if reindex is not None:
+    #         reindex(idxs=['getObjPositionInParent'])
+    # 
+    # def __getitem__(self, key):
+    #     # we allow KeyError here (see `_getOb` above)
+    #     # XXX: this might shadow the version from OFS.Folder, which gets used
+    #     # when inheriting from this class on the archetypes level;  by doing
+    #     # so it's likely to break support for webdav...
+    #     return super(OrderedBTreeFolderBase, self)._getOb(key)
     
     # portal_type
     
@@ -142,7 +225,7 @@ class Alias(PortalContent, Contained):
     def portal_type(self, value):
         self._alias_portal_type = value
     
-    # discussion container
+    # Discussion container - needs special acquisition handling
     
     @getproperty
     def talkback(self):
@@ -159,6 +242,8 @@ class Alias(PortalContent, Contained):
             return
         aq_inner(aliased).talkback = value
     
+    # Evil hacks
+    
     @property
     def __class__(self):
         """/me whistles and looks to the sky whilst walking slowly backwards,
@@ -168,7 +253,12 @@ class Alias(PortalContent, Contained):
         if aliased is None:
             return Alias
         else:
-            return aq_base(aliased).__class__
+            # We need this for super() and friends to work
+            
+            # XXX: this is mega evil. Cache it at least.
+            class Alias_(Alias, aq_base(aliased).__class__):
+                pass
+            return Alias_
     
     # Delegate anything else that we can via a __getattr__ hook
     
@@ -177,9 +267,17 @@ class Alias(PortalContent, Contained):
         to the aliased object
         """
         
-        # Never delegate _v_ attributes. If they're not set on the alias
-        # directly, they don't exist.
-        if name.startswith('_v_'):
+        # Some things we don't delegate:
+        #   - the annotations btree (we have an adapter to merge)
+        #   - _v_ attributes
+        #   - _p_ attributes
+        #   - Permissions
+        if (
+            name == '__annotations__' or
+            name.startswith('_v_') or 
+            name.startswith('_p_') or 
+            name.endswith('_Permission')
+        ):
             raise AttributeError(name)
         
         aliased = self._target
@@ -256,8 +354,9 @@ class Alias(PortalContent, Contained):
             
         return aliased
 
-
 @grok.subscribe(IAlias, IObjectModifiedEvent)
 def clearCaches(obj, event):
+    """If the alias is modified, clear the _v_ attribute caches
+    """
     obj._v_target = None
     obj._v__providedBy__ = None

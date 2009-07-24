@@ -15,6 +15,12 @@ Bugs/to test
         - should retain settings of target
         - should not show children of target
   
+  [ ] Collections
+        - criteria should continue to work
+  
+  [ ] AT references to alias
+        - e.g. related item
+  
   [x] Comments
         - should be shared
   
@@ -55,33 +61,31 @@ Bugs/to test
         - should be based on target id
         - must not create naming conflicts
   
+  [x] Different display templates
+        - default should be whatever the target has set
+        - 'display' menu actions on alias should not affect target
+  
 Integration
 -----------
 
- [ ] Allow different display templates
-        - default to whatever the display template on the target was
-        - allow override via 'display' menu
-        - also allow setting default page (not defaulted)
+ [ ] Optionally allow folder behaviour to delegate to target
+        - needed for collections to work, for example
+        - target must be folderish
+        - disallow adding content to alias directly
+        - won't show folder listings: children won't have catalog entries
+        - _getOb, __getitem__, objectIds, objectValues, objectItems, has_key
+
+ [ ] Ensure alias has distinct UID
+        - to allow separate references to alias and target
+        - need to solve the AT->Dexterity reference problem first
+
+ [ ] Make alias more read-only
+        - hide regular edit actions/show alias @@edit view (override viewlet)
+        - disallow portlet management
 
  [ ] Add "paste as alias" action
 
- [ ] Provide link to alias edit form
-        - and not to target edit form
-        - may need to customise the edit content actions viewlet
-
- [ ] Make alias more read-only
-        - currently, it's too easy to get to an edit screen and set attributes
-          on the alias by accident
-        - find a way to hide actions (e.g. edit tab)
-        - disallow portlet management
-        - use __setattr__ to stop setting attributes not pre-defined?
-
- [ ] Implement folder behaviour by mixing in plone.folder
-        - Alias is folderish if the target is folderish
-        - Alias can only contain other aliases by default (?)
-        - A folder listing on an alias of a folder shows items in the alias
-            folder, using the settings and metadata of the target folder
-        - Traversal to sub-items should not delegate
+ [ ] Add optional title override
 
 Missing
 -------
@@ -91,15 +95,14 @@ Missing
 Possible future functionality
 -----------------------------
 
- [ ] Allow title override
- [ ] Allow optionally showing link to original (in a viewlet?)
- [ ] Add optional icon overlay
  [ ] Optionally keep workflow state + permissions in sync
         - set marker interface on source
         - register event handler
+
  [ ] Optionally allow traversal to children of target
         - do not create fake catalog entries
         - regular folder listings won't work
+        - allow certain things like RichDocument to work
 
 Content class hierarchy
 -----------------------
