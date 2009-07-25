@@ -91,6 +91,9 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
     _alias_portal_type = None
     cmf_uid = None
     
+    _aliasTitle = ''
+    _aliasTraversal = False
+    
     # to make debugging easier
     isAlias = True
     
@@ -112,14 +115,17 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
     
     @getproperty
     def title(self):
+        if self._aliasTitle:
+            return self._aliasTitle
+        
         aliased = self._target
         if aliased is None:
-            return ''
+            return self._aliasTitle
         return aq_inner(aliased).Title()
     
     @setproperty
     def title(self, value):
-        pass
+        self._aliasTitle = value
     
     def Description(self):
         """Delegated description
@@ -267,11 +273,14 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
         to the aliased object
         """
         
-        # Some things we don't delegate:
+        # Some things we don't delegate (but may acquire)
+        # 
         #   - the annotations btree (we have an adapter to merge)
         #   - _v_ attributes
         #   - _p_ attributes
         #   - Permissions
+        # 
+
         if (
             name == '__annotations__' or
             name.startswith('_v_') or 
@@ -310,19 +319,19 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
         
         return aliased_attr
     
-    # ensure _aliased_object is readonly once set
+    # ensure _aliasTarget is readonly once set
     
     @getproperty
-    def _aliased_object(self):
-        return self.__dict__.get('_aliased_object', None)
+    def _aliasTarget(self):
+        return self.__dict__.get('_aliasTarget', None)
     
     @setproperty
-    def _aliased_object(self, value):
-        if '_aliased_object' in self.__dict__:
-            raise AttributeError("Cannot set _aliased_object more than once")
+    def _aliasTarget(self, value):
+        if '_aliasTarget' in self.__dict__:
+            raise AttributeError("Cannot set _aliasTarget more than once")
         
         if not IRelationValue.providedBy(value):
-            raise AttributeError("_aliased_object must be an IRelationField")
+            raise AttributeError("_aliasTarget must be an IRelationField")
         
         counter = 0
         
@@ -340,7 +349,7 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
             to_id = intids.getId(target)
             value = RelationValue(to_id)
         
-        self.__dict__['_aliased_object'] = value
+        self.__dict__['_aliasTarget'] = value
     
     # Helper to get the object with _v_ caching
     
@@ -348,9 +357,9 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
     def _target(self):
         aliased = getattr(self, '_v_target', None)
         if aliased is None:
-            if self._aliased_object is None or self._aliased_object.isBroken():
+            if self._aliasTarget is None or self._aliasTarget.isBroken():
                 return None
-            aliased = self._v_target = self._aliased_object.to_object
+            aliased = self._v_target = self._aliasTarget.to_object
             
         return aliased
 

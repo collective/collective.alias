@@ -34,7 +34,13 @@ class AliasAnnotations(grok.Adapter, AttributeAnnotations):
         
     def __nonzero__(self):
         return bool(getattr(self.obj, '__annotations__', 0)) or len(self.target)
-
+    
+    def setdefault(self, key, default):
+        value = super(AliasAnnotations, self).get(key, _marker)
+        if value is _marker:
+            self[key] = value = default
+        return value
+    
     def get(self, key, default=None):
         value = super(AliasAnnotations, self).get(key, _marker)
         if value is _marker:

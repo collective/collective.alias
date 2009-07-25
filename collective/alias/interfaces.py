@@ -1,4 +1,6 @@
 from zope.interface import Interface
+from zope import schema
+
 from plone.directives import form
 
 from z3c.relationfield.schema import RelationChoice
@@ -11,11 +13,30 @@ class IAlias(form.Schema):
     schema of the aliased object.
     """
     
-    _aliased_object = RelationChoice(
+    _aliasTarget = RelationChoice(
             title=_(u"Aliased object"),
             description=_(u"Choose an object to alias"),
             required=True,
             source=ObjPathSourceBinder(),
+        )
+    
+    _aliasTitle = schema.TextLine(
+            title=_(u"Title override"),
+            description=_(u"If you want your alias to have a different title "
+                           "than the aliased object, enter a title here."),
+            required=False,
+        )
+    
+    _aliasTraversal = schema.Bool(
+            title=_(u"Allow traversal"),
+            description=_(u"If selected, children of the aliased object will "
+                           "appear as children of the alias. Note that they "
+                           "will not be indexed in the catalog, and probably "
+                           "won't show up in folder listings. This option "
+                           "may be useful for e.g. Collections, where some "
+                           "information is stored in child objects."),
+            required=True,
+            default=False,
         )
 
 

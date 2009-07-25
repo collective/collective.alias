@@ -77,6 +77,6 @@ class Edit(dexterity.EditForm):
         super(Edit, self).updateFields()
         
         # Don't allow the alias to be edited - it causes all kinds of confusion
-        if '_aliased_object' in self.fields:
-            del self.fields['_aliased_object']
+        if '_aliasTarget' in self.fields:
+            del self.fields['_aliasTarget']
 

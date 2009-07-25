@@ -45,7 +45,7 @@ class AliasInformation(grok.Adapter):
         for rel in catalog.findRelations({
             'to_id': to_id,
             'from_interfaces_flattened': interface,
-            'from_attribute': '_aliased_object',
+            'from_attribute': '_aliasTarget',
         }):
             
             yield rel.from_id

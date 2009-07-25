@@ -80,7 +80,7 @@ def unmarkTargetOnRemove(alias, event):
             for rel in catalog.findRelations({
                 'to_id': to_id,
                 'from_interfaces_flattened': IAlias,
-                'from_attribute': '_aliased_object',
+                'from_attribute': '_aliasTarget',
             }):
                 # abort if there is another alias
                 if alias_base is not rel.from_object:
