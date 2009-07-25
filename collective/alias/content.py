@@ -144,79 +144,33 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
             return 0
         return aq_inner(aliased).isPrincipiaFolderish
     
-    # def _getOb(self, id, default=_marker):
-    #     """ Return the named object from the folder. """
-    #     try:
-    #         return BTreeFolder2Base._getOb(id, default)
-    #     except KeyError, e:
-    #         raise AttributeError(e)
-    # 
-    # def _setOb(self, id, object):
-    #     """ Store the named object in the folder. """
-    #     # Set __name__ and __parent__ if the object supports it
-    #     if ILocation.providedBy(object):
-    #         if not IContained.providedBy(object):
-    #             alsoProvides(object, IContained)
-    #         oldname = getattr(object, '__name__', None)
-    #         oldparent = getattr(object, '__parent__', None)
-    #         if id is not oldname:
-    #             object.__name__ = id
-    #         if self is not oldparent:
-    #             object.__parent__ = self
-    #     BTreeFolder2Base._setOb(id, object)
-    #     IOrdering(self).notifyAdded(id)     # notify the ordering adapter
-    # 
-    # def _delOb(self, id):
-    #     """ Remove the named object from the folder. """
-    #     # Unset __parent__ and __name__ prior to removing the object.
-    #     # Note that there is a slight discrepancy with the Zope 3 behaviour
-    #     # here: we do this before the IObjectRemovedEvent is fired. In
-    #     # zope.container, IObjectRemovedEvent is fired before the object is
-    #     # actually deleted and this information is unset. In Zope2's OFS,
-    #     # there's a different IObjectWillBeRemovedEvent that is fired first,
-    #     # then the object is removed, and then IObjectRemovedEvent is fired.
-    #     try:
-    #         obj = self._getOb(id, _marker)
-    #         if obj is not _marker:
-    #             if IContained.providedBy(obj):
-    #                 obj.__parent__ = None
-    #                 obj.__name__ = None
-    #     except AttributeError:
-    #         pass        # No need to fail if we can't set these
-    #     super(OrderedBTreeFolderBase, self)._delOb(id)
-    #     IOrdering(self).notifyRemoved(id)   # notify the ordering adapter
-    # 
-    # def objectIds(self, spec=None, ordered=True):
-    #     if not ordered:
-    #         return super(OrderedBTreeFolderBase, self).objectIds(spec)
-    #     ordering = IOrdering(self)
-    #     if spec is None:
-    #         return ordering.idsInOrder()
-    #     else:
-    #         ids = super(OrderedBTreeFolderBase, self).objectIds(spec)
-    #         idxs = []
-    #         for id in ids:
-    #             idxs.append((ordering.getObjectPosition(id), id))
-    #         return [x[1] for x in sorted(idxs, key=lambda a: a[0])]
-    # 
-    # def manage_renameObject(self, id, new_id, REQUEST=None):
-    #     """ Rename a particular sub-object without changing its position. """
-    #     old_position = self.getObjectPosition(id)
-    #     result = super(OrderedBTreeFolderBase, self).manage_renameObject(id,
-    #         new_id, REQUEST)
-    #     if old_position is None:
-    #         return result
-    #     self.moveObjectToPosition(new_id, old_position, suppress_events=True)
-    #     reindex = getattr(self._getOb(new_id), 'reindexObject', None)
-    #     if reindex is not None:
-    #         reindex(idxs=['getObjPositionInParent'])
-    # 
-    # def __getitem__(self, key):
-    #     # we allow KeyError here (see `_getOb` above)
-    #     # XXX: this might shadow the version from OFS.Folder, which gets used
-    #     # when inheriting from this class on the archetypes level;  by doing
-    #     # so it's likely to break support for webdav...
-    #     return super(OrderedBTreeFolderBase, self)._getOb(key)
+    # Support for _aliasTraversal
+    
+    def _getOb(self, id, default=_marker):
+        if self._aliasTraversal:
+            aliased = self._target
+            if aliased is not None:
+                obj = aliased._getOb(id, default)
+                if obj is default:
+                    if default is _marker:
+                        raise KeyError(id)
+                    return default
+                return aq_base(obj).__of__(self)
+        return CMFOrderedBTreeFolderBase._getOb(self, id, default)
+    
+    def objectIds(self, spec=None, ordered=True):
+        if self._aliasTraversal:
+            aliased = self._target
+            if aliased is not None:
+                return aliased.objectIds(spec)
+        return CMFOrderedBTreeFolderBase.objectIds(self, spec, ordered)
+    
+    def __getitem__(self, key):
+        if self._aliasTraversal:
+            aliased = self._target
+            if aliased is not None:
+                return aliased.__getitem__(key)
+        return CMFOrderedBTreeFolderBase.__getitem__(self, key)
     
     # portal_type
     

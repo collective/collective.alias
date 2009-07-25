@@ -15,8 +15,9 @@ Bugs/to test
         - should retain settings of target
         - should not show children of target
   
-  [ ] Collections
+  [x] Collections
         - criteria should continue to work
+        - need to tick "allow traversal"
   
   [ ] AT references to alias
         - e.g. related item
@@ -67,13 +68,6 @@ Bugs/to test
   
 Integration
 -----------
-
- [ ] Optionally allow folder behaviour to delegate to target
-        - needed for collections to work, for example
-        - target must be folderish
-        - disallow adding content to alias directly
-        - won't show folder listings: children won't have catalog entries
-        - _getOb, __getitem__, objectIds, objectValues, objectItems, has_key
 
  [ ] Ensure alias has distinct UID
         - to allow separate references to alias and target
