@@ -69,10 +69,6 @@ Bugs/to test
 Integration
 -----------
 
- [ ] Ensure alias has distinct UID
-        - to allow separate references to alias and target
-        - need to solve the AT->Dexterity reference problem first
-
  [ ] Make alias more read-only
         - hide regular edit actions/show alias @@edit view (override viewlet)
         - disallow portlet management
@@ -80,6 +76,10 @@ Integration
  [ ] Add "paste as alias" action
 
  [ ] Add optional title override
+
+ [ ] Ensure alias has distinct UID
+        - to allow separate references to alias and target
+        - need to solve the AT->Dexterity reference problem first
 
 Missing
 -------
