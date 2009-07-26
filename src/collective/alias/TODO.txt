@@ -31,7 +31,7 @@ Bugs/to test
   [x] Acquired content
         - probably wrapped in target object
 
-  [x] Annotations (e.g. locks, contextual portlets)
+  [x] Annotations (e.g. contextual portlets)
         - should be shared
 
   [x] Aliasing of methods
@@ -75,16 +75,9 @@ Integration
 
  [ ] Add "paste as alias" action
 
- [ ] Add optional title override
-
  [ ] Ensure alias has distinct UID
         - to allow separate references to alias and target
         - need to solve the AT->Dexterity reference problem first
-
-Missing
--------
- 
- [ ] Add integration/functional tests!
 
 Possible future functionality
 -----------------------------

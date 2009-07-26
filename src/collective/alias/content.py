@@ -11,6 +11,7 @@ from zope.interface.declarations import getObjectSpecification
 from zope.interface.declarations import ObjectSpecificationDescriptor
 
 from zope.component import queryUtility
+from zope.annotation.interfaces import IAnnotations
 
 from zope.app.container.contained import Contained
 
@@ -98,9 +99,11 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
     isAlias = True
     
     def __init__(self, id=None, **kwargs):
-        CMFOrderedBTreeFolderBase.__init__(self, id, **kwargs)
+        CMFOrderedBTreeFolderBase.__init__(self, id)
         if id is not None:
             self.id = id
+        for k, v in kwargs.items():
+            setattr(self, k, v)
     
     #
     # Delegating methods
@@ -185,6 +188,18 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
     def portal_type(self, value):
         self._alias_portal_type = value
     
+    # Hopelessly, Archetypes accesses obj.__annotations__ directly, instead
+    # of using an IAnnotations adapter. Delegate to our own adapter, which
+    # uses __alias_annotations__ as the "real" dictionary
+    
+    @getproperty
+    def __annotations__(self):
+        return IAnnotations(self)
+    
+    @setproperty
+    def __annotations__(self, value):
+        pass
+    
     # Discussion container - needs special acquisition handling
     
     @getproperty
@@ -236,7 +251,6 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
         # 
 
         if (
-            name == '__annotations__' or
             name.startswith('_v_') or 
             name.startswith('_p_') or 
             name.endswith('_Permission')
@@ -285,7 +299,7 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
             raise AttributeError("Cannot set _aliasTarget more than once")
         
         if not IRelationValue.providedBy(value):
-            raise AttributeError("_aliasTarget must be an IRelationField")
+            raise AttributeError("_aliasTarget must be an IRelationValue")
         
         counter = 0
         
