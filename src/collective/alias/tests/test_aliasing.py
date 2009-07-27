@@ -8,6 +8,8 @@ from collective.alias.tests.layer import Layer
 from zope.component import getUtility
 from zope.security import checkPermission
 
+from zope.annotation.interfaces import IAnnotations
+
 from z3c.relationfield import RelationValue
 from zope.intid.interfaces import IIntIds
 
@@ -230,7 +232,19 @@ class TestAliasing(PloneTestCase):
         self.assertEquals('folder_listing', self.folder['a2'].getLayout())
     
     def test_annotations(self):
-        pass
+        d1 = IAnnotations(self.folder['d1'])
+        a1 = IAnnotations(self.folder['a1'])
+        
+        d1['test.key1'] = 1
+        self.assertEquals(1, a1['test.key1'])
+        
+        a1['test.key2'] = 2
+        self.assertEquals(2, a1['test.key2'])
+        self.failIf('test.key2' in d1)
+        
+        a1['test.key1'] = 3
+        self.assertEquals(1, d1['test.key1'])
+        self.assertEquals(3, a1['test.key1'])
     
     def test_modified_event_rebroadcast(self):
         pass
