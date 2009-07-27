@@ -1,6 +1,7 @@
 import logging
 import types
 
+from persistent.mapping import PersistentMapping
 from rwproperty import getproperty, setproperty
 
 from five import grok
@@ -90,6 +91,8 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
     
     __providedBy__ = DelegatingSpecification()
     _alias_portal_type = None
+    _alias_properties = None
+    
     cmf_uid = None
     
     _aliasTitle = ''
@@ -104,7 +107,10 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
             self.id = id
         for k, v in kwargs.items():
             setattr(self, k, v)
-    
+        
+        # Ensure that the alias gets its own workflow history
+        self.workflow_history = PersistentMapping()
+        
     #
     # Delegating methods
     #
@@ -199,6 +205,21 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
     @setproperty
     def __annotations__(self, value):
         pass
+    
+    # Alias properties until at least one property is modified
+    
+    @getproperty
+    def _properties(self):
+        if self._alias_properties is not None:
+            return self._alias_properties
+        aliased = aq_inner(self._target)
+        if aliased is None:
+            return super(Alias, self)._properties
+        return aliased.properties
+    
+    @setproperty
+    def _properties(self, value):
+        self._alias_properties = value
     
     # Discussion container - needs special acquisition handling
     

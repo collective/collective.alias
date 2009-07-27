@@ -1,9 +1,12 @@
 import unittest
 
 from Products.PloneTestCase.ptc import PloneTestCase
+from Products.Five.security import newInteraction
+
 from collective.alias.tests.layer import Layer
 
 from zope.component import getUtility
+from zope.security import checkPermission
 
 from z3c.relationfield import RelationValue
 from zope.intid.interfaces import IIntIds
@@ -29,6 +32,8 @@ class TestAliasing(PloneTestCase):
     layer = Layer
     
     def afterSetUp(self):
+        newInteraction() # workaround for problem with checkPermission
+        
         self.intids = getUtility(IIntIds)
         
         self.folder.invokeFactory('Document', 'd1')
@@ -137,13 +142,92 @@ class TestAliasing(PloneTestCase):
         self.failUnless(self.folder['a2'].isPrincipiaFolderish)
     
     def test_alias_traversal(self):
-        pass
+        self.folder.invokeFactory('Folder', 'f1')
+        relation = RelationValue(self.intids.getId(self.folder['f1']))
+        
+        self.folder['f1'].invokeFactory('Document', 'd11')
+        
+        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.assertRaises(KeyError, self.folder['a1'].__getitem__, 'd11')
+        
+        self.folder['a2']._aliasTraversal = True
+        self.failUnless(self.folder['a2']['d11'].aq_base, self.folder['f1']['d11'].aq_base)
+        
+    def test_alias_child(self):
+        self.folder.invokeFactory('Folder', 'f1')
+        
+        relation = RelationValue(self.intids.getId(self.folder['f1']))
+        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        
+        self.folder['a2'].invokeFactory('Document', 'd21')
+        self.assertEquals(self.folder['a2'].absolute_url() + '/d21',
+                          self.folder['a2']['d21'].absolute_url())
     
-    def test_permissions(self):
-        pass
+    def test_permissions_not_aliased(self):
+        self.failUnless(checkPermission('zope2.View', self.folder['d1']))
+        self.folder['d1'].manage_permission('View', roles=['Manager'])
+        self.failIf(checkPermission('zope2.View', self.folder['d1']))
+        self.failUnless(checkPermission('zope2.View', self.folder['a1']))
+    
+    def test_workflow_not_aliased_change_target(self):
+        self.setRoles(['Manager'])
+        wf = getToolByName(self.portal, 'portal_workflow')
+        
+        self.assertEquals('private', wf.getInfoFor(self.folder['d1'], 'review_state'))
+        self.assertEquals('private', wf.getInfoFor(self.folder['a1'], 'review_state'))
+        
+        wf.doActionFor(self.folder['d1'], 'publish')
+        
+        self.assertEquals('published', wf.getInfoFor(self.folder['d1'], 'review_state'))
+        self.assertEquals('private', wf.getInfoFor(self.folder['a1'], 'review_state'))
+    
+    def test_workflow_not_aliased_change_alias(self):
+        self.setRoles(['Manager'])
+        wf = getToolByName(self.portal, 'portal_workflow')
+        
+        self.assertEquals('private', wf.getInfoFor(self.folder['d1'], 'review_state'))
+        self.assertEquals('private', wf.getInfoFor(self.folder['a1'], 'review_state'))
+        
+        wf.doActionFor(self.folder['a1'], 'publish')
+        
+        self.assertEquals('private', wf.getInfoFor(self.folder['d1'], 'review_state'))
+        self.assertEquals('published', wf.getInfoFor(self.folder['a1'], 'review_state'))
+    
+    def test_workflow_chain_aliased(self):
+        wf = getToolByName(self.portal, 'portal_workflow')
+        wf.setChainForPortalTypes(('collective.alias.alias',), ())
+        
+        relation = RelationValue(self.intids.getId(self.folder['d1']))
+        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        
+        self.assertEquals(('simple_publication_workflow',), wf.getChainFor(self.folder['a2']))
+    
+    def test_workflow_initial_state(self):
+        wf = getToolByName(self.portal, 'portal_workflow')
+        
+        self.assertEquals(('simple_publication_workflow',), wf.getChainFor(self.folder['d1']))
+        wf['simple_publication_workflow'].initial_state = 'published'
+        
+        relation = RelationValue(self.intids.getId(self.folder['d1']))
+        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        
+        self.assertEquals('private', wf.getInfoFor(self.folder['a1'], 'review_state'))
+        self.assertEquals('private', wf.getInfoFor(self.folder['d1'], 'review_state'))
+        self.assertEquals('published', wf.getInfoFor(self.folder['a2'], 'review_state'))
     
     def test_display_templates(self):
-        pass
+        self.folder.invokeFactory('Folder', 'f1')
+        
+        relation = RelationValue(self.intids.getId(self.folder['f1']))
+        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        
+        self.folder['f1'].setLayout('folder_tabular_view')
+        self.assertEquals('folder_tabular_view', self.folder['f1'].getLayout())
+        self.assertEquals('folder_tabular_view', self.folder['a2'].getLayout())
+        
+        self.folder['a2'].setLayout('folder_listing')
+        self.assertEquals('folder_tabular_view', self.folder['f1'].getLayout())
+        self.assertEquals('folder_listing', self.folder['a2'].getLayout())
     
     def test_annotations(self):
         pass
