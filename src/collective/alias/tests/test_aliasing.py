@@ -6,9 +6,18 @@ from Products.Five.security import newInteraction
 from collective.alias.tests.layer import Layer
 
 from zope.component import getUtility
-from zope.security import checkPermission
+from zope.component import provideHandler
+from zope.component import getGlobalSiteManager
 
+from zope.interface import Interface
+
+from zope import schema
+
+from zope.security import checkPermission
 from zope.annotation.interfaces import IAnnotations
+
+from zope.lifecycleevent.interfaces import IObjectModifiedEvent
+from zope.lifecycleevent import modified
 
 from z3c.relationfield import RelationValue
 from zope.intid.interfaces import IIntIds
@@ -21,8 +30,10 @@ from collective.alias.interfaces import IHasAlias
 
 from plone.dexterity.fti import DexterityFTI
 
-from zope.interface import Interface
-from zope import schema
+events_received = []
+def object_event_handler(obj, event):
+    global events_received
+    events_received.append((obj, event))
 
 class ITest(Interface):
     
@@ -34,8 +45,11 @@ class TestAliasing(PloneTestCase):
     layer = Layer
     
     def afterSetUp(self):
-        newInteraction() # workaround for problem with checkPermission
+        global events_received
+        events_received = []
         
+        newInteraction() # workaround for problem with checkPermission
+
         self.intids = getUtility(IIntIds)
         
         self.folder.invokeFactory('Document', 'd1')
@@ -247,13 +261,28 @@ class TestAliasing(PloneTestCase):
         self.assertEquals(3, a1['test.key1'])
     
     def test_modified_event_rebroadcast(self):
-        pass
+        provideHandler(object_event_handler, (IAlias, IObjectModifiedEvent,))
+        
+        modified(self.folder['d1'])
+        
+        self.assertEquals(1, len(events_received))
+        self.failUnless(self.folder['a1'].aq_base is events_received[0][0].aq_base)
+        
+        sm = getGlobalSiteManager()
+        sm.unregisterHandler(object_event_handler, required=(IAlias, IObjectModifiedEvent,))
     
-    def test_name_chooser(self):
-        pass
-    
-    def test_talkback(self):
-        pass
-    
+    def test_comments(self):
+        pd = getToolByName(self.portal, 'portal_discussion')
+        
+        self.folder['d1'].getTypeInfo().allow_discussion = True
+        
+        discussion = pd.getDiscussionFor(self.folder['d1'])
+        discussion.createReply("Reply 1", "Some text")
+        
+        discussion = pd.getDiscussionFor(self.folder['a1'])
+        
+        self.assertEquals(1, discussion.replyCount(self.folder['a1']))
+        self.assertEquals("Reply 1", discussion.getReplies()[0].title)
+
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
