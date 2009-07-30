@@ -30,7 +30,7 @@ class TestAliasing(PloneTestCase):
         
     def test_find_aliases_single(self):
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a1', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a1', _aliasTarget=relation)
         
         info = IAliasInformation(self.folder['d1'])
         
@@ -41,10 +41,10 @@ class TestAliasing(PloneTestCase):
     
     def test_find_aliases_multiple(self):
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a1', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a1', _aliasTarget=relation)
         
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         
         info = IAliasInformation(self.folder['d1'])
         
@@ -67,7 +67,7 @@ class TestAliasing(PloneTestCase):
     
     def test_find_ids_single(self):
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a1', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a1', _aliasTarget=relation)
         
         info = IAliasInformation(self.folder['d1'])
         
@@ -77,10 +77,10 @@ class TestAliasing(PloneTestCase):
     
     def test_find_ids_multiple(self):
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a1', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a1', _aliasTarget=relation)
         
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         
         info = IAliasInformation(self.folder['d1'])
         

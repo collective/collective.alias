@@ -11,7 +11,7 @@ class TestSetup(PloneTestCase):
     
     def test_type_installed(self):
         tt = getToolByName(self.portal, 'portal_types')
-        self.failUnless('collective.alias.alias' in tt.objectIds())
+        self.failUnless('collective.alias' in tt.objectIds())
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

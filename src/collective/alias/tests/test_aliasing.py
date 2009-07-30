@@ -58,7 +58,7 @@ class TestAliasing(PloneTestCase):
         self.folder['d1'].setText("<p>Document one body</p>")
         
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a1', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a1', _aliasTarget=relation)
     
     def test_alias_archetypes_object(self):
         self.failUnless(self.folder['a1'].isAlias)
@@ -82,7 +82,7 @@ class TestAliasing(PloneTestCase):
         self.folder['t1'].foo = "Foo Bar"
         
         relation = RelationValue(self.intids.getId(self.folder['t1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         
         self.failUnless(ITest.providedBy(self.folder['a2']))
         self.assertEquals("Dummy title", self.folder['a2'].title)
@@ -108,7 +108,7 @@ class TestAliasing(PloneTestCase):
     
     def test_has_alias_counter_up(self):
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         
         self.failUnless(IHasAlias.providedBy(self.folder['d1']))
         self.folder._delObject('a1')
@@ -118,7 +118,7 @@ class TestAliasing(PloneTestCase):
     
     def test_has_alias_counter_down(self):
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         
         self.failUnless(IHasAlias.providedBy(self.folder['d1']))
         self.folder._delObject('a2')
@@ -137,12 +137,12 @@ class TestAliasing(PloneTestCase):
     
     def test_transitive_alias(self):
         relation = RelationValue(self.intids.getId(self.folder['a1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         self.failUnless(self.folder['a1']._target.aq_base is self.folder['a2']._target.aq_base)
 
     def test_title_override(self):
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation, _aliasTitle=u"Title override")
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation, _aliasTitle=u"Title override")
         self.assertEquals("Title override", self.folder['a2'].Title())
         self.assertEquals("Title override", self.folder['a2'].title)
         
@@ -154,7 +154,7 @@ class TestAliasing(PloneTestCase):
         
         self.folder.invokeFactory('Folder', 'f1')
         relation = RelationValue(self.intids.getId(self.folder['f1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         self.failUnless(self.folder['a2'].isPrincipiaFolderish)
     
     def test_alias_traversal(self):
@@ -163,7 +163,7 @@ class TestAliasing(PloneTestCase):
         
         self.folder['f1'].invokeFactory('Document', 'd11')
         
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         self.assertRaises(KeyError, self.folder['a1'].__getitem__, 'd11')
         
         self.folder['a2']._aliasTraversal = True
@@ -173,7 +173,7 @@ class TestAliasing(PloneTestCase):
         self.folder.invokeFactory('Folder', 'f1')
         
         relation = RelationValue(self.intids.getId(self.folder['f1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         
         self.folder['a2'].invokeFactory('Document', 'd21')
         self.assertEquals(self.folder['a2'].absolute_url() + '/d21',
@@ -211,10 +211,10 @@ class TestAliasing(PloneTestCase):
     
     def test_workflow_chain_aliased(self):
         wf = getToolByName(self.portal, 'portal_workflow')
-        wf.setChainForPortalTypes(('collective.alias.alias',), ())
+        wf.setChainForPortalTypes(('collective.alias',), ())
         
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         
         self.assertEquals(('simple_publication_workflow',), wf.getChainFor(self.folder['a2']))
     
@@ -225,7 +225,7 @@ class TestAliasing(PloneTestCase):
         wf['simple_publication_workflow'].initial_state = 'published'
         
         relation = RelationValue(self.intids.getId(self.folder['d1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         
         self.assertEquals('private', wf.getInfoFor(self.folder['a1'], 'review_state'))
         self.assertEquals('private', wf.getInfoFor(self.folder['d1'], 'review_state'))
@@ -235,7 +235,7 @@ class TestAliasing(PloneTestCase):
         self.folder.invokeFactory('Folder', 'f1')
         
         relation = RelationValue(self.intids.getId(self.folder['f1']))
-        self.folder.invokeFactory('collective.alias.alias', 'a2', _aliasTarget=relation)
+        self.folder.invokeFactory('collective.alias', 'a2', _aliasTarget=relation)
         
         self.folder['f1'].setLayout('folder_tabular_view')
         self.assertEquals('folder_tabular_view', self.folder['f1'].getLayout())

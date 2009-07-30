@@ -19,7 +19,7 @@ class Add(dexterity.AddForm):
     object has been created.
     """
     
-    grok.name('collective.alias.alias')
+    grok.name('collective.alias')
     
     def add(self, object):
         
