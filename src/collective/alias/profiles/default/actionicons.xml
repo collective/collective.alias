@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<action-icons xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:domain="collective.alias">
+    <action-icon
+        category="object_buttons"
+        action_id="paste_alias"
+        title="Paste alias" priority="0"
+        icon_expr="++resource++collective.alias/alias.gif"
+        i18n:attributes="title"
+        />
+</action-icons>
