@@ -17,7 +17,7 @@ class IAlias(form.Schema):
             title=_(u"Aliased object"),
             description=_(u"Choose an object to alias"),
             required=True,
-            source=ObjPathSourceBinder(),
+            source=ObjPathSourceBinder({'is_default_page': (True, False,)}),
         )
     
     _aliasTitle = schema.TextLine(
@@ -37,6 +37,19 @@ class IAlias(form.Schema):
                            "information is stored in child objects."),
             required=True,
             default=False,
+        )
+
+
+class IAliasSettings(form.Schema):
+    """Configuration settings used in registry.xml
+    """
+    
+    traversalTypes = schema.List(
+            title=_(u"Traversal types"),
+            description=_(u"List of types which by default allow traversal"),
+            required=True,
+            default=[],
+            value_type=schema.Choice(vocabulary="collective.alias.PortalTypes"),
         )
 
 

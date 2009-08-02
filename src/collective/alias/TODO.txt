@@ -68,18 +68,10 @@ Bugs/to test
   
 Integration
 -----------
- [ ] Add "paste as alias" action
- 
- [ ] Support automatically enabling "alias traversal" for certain types
-        - store settings in plone.registry
-        - for paste
-        - for new objects?
- 
+
  [ ] Make alias more read-only
         - hide regular edit actions/show alias @@edit view (override viewlet)
         - disallow portlet management
-
-
 
  [ ] Ensure alias has distinct UID
         - to allow separate references to alias and target

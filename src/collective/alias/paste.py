@@ -7,6 +7,9 @@ from OFS.interfaces import IObjectManager
 
 import OFS.Moniker
 
+from zope.event import notify
+from zope.lifecycleevent import ObjectCreatedEvent
+
 from zope.component import getUtility
 from z3c.relationfield import RelationValue
 from zope.intid.interfaces import IIntIds
@@ -57,6 +60,8 @@ def pasteAsAlias(context, cb_copy_data=None, request=None):
     for ob in oblist:
         relation = RelationValue(intids.getId(ob))
         alias = createContent('collective.alias', _aliasTarget=relation)
+        
+        notify(ObjectCreatedEvent(alias))
         
         name = INameChooser(context).chooseName(ob.getId(), alias)
         alias.id = name

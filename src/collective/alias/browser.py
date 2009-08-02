@@ -51,7 +51,14 @@ class Add(dexterity.AddForm):
         
         immediate_view = fti.immediate_view or 'view'
         self.immediate_view = "%s/%s/%s" % (container.absolute_url(), new_object.id, immediate_view,)
-
+    
+    def updateFields(self):
+        super(Add, self).updateFields()
+        
+        # Don't set the traversal flag on the add form: we default by
+        # portal type once we know what the portal type is
+        if '_aliasTraversal' in self.fields:
+            del self.fields['_aliasTraversal']
 
 class Edit(dexterity.EditForm):
     """Override the edit form not to depend on the portal_type

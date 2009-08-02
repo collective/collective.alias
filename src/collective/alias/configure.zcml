@@ -6,7 +6,7 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.alias">
 
-    <include package="collective.autopermission" />
+    <includeDependencies package="." />
 
     <permission
         id="collective.alias.AddAlias"

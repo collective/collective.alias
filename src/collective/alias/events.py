@@ -9,6 +9,7 @@ from zope.component import queryUtility
 
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.lifecycleevent.interfaces import IObjectCopiedEvent
+from zope.lifecycleevent.interfaces import IObjectCreatedEvent
 
 from zope.lifecycleevent import ObjectModifiedEvent
 
@@ -21,11 +22,14 @@ from OFS.interfaces import IObjectWillBeRemovedEvent
 from zope.intid.interfaces import IIntIds
 from zc.relation.interfaces import ICatalog
 
+from plone.registry.interfaces import IRegistry
+
 from Acquisition import aq_base, aq_inner, aq_parent
 
 from collective.alias.interfaces import IAlias
 from collective.alias.interfaces import IHasAlias
 from collective.alias.interfaces import IAliasInformation
+from collective.alias.interfaces import IAliasSettings
 
 from zope.event import notify
 
@@ -44,6 +48,25 @@ def rebroadcastModifiedEvent(obj, event):
             new_event = ObjectModifiedEvent(alias, *event.descriptions)
             notify(new_event)
 
+# Set the _aliasTraversal flag based on type defaults
+
+@grok.subscribe(IAlias, IObjectCreatedEvent)
+def setAliasTraversal(alias, event):
+    """When the alias is create, set the _aliasTraversal attribute according
+    to the settings in the registry.
+    """
+    
+    registry = queryUtility(IRegistry)
+    if registry is None:
+        return
+    
+    try:
+        settings = registry.forInterface(IAliasSettings)
+    except KeyError:
+        return
+    
+    if alias.portal_type in settings.traversalTypes:
+        alias._aliasTraversal = True
 
 # Manage the IHasAlias marker
 

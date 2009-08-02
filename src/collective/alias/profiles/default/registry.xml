@@ -1,0 +1,13 @@
+<registry>
+    
+    <!-- Register the records -->
+    <records interface="collective.alias.interfaces.IAliasSettings" />
+    
+    <!-- Configure initial settings -->
+    <record name="collective.alias.interfaces.IAliasSettings.traversalTypes">
+      <value>
+          <element>Topic</element>
+      </value>
+    </record>
+    
+</registry>
