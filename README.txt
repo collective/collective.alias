@@ -15,6 +15,7 @@ particular to the alias, however, including:
   * Permission/role map (e.g. as set by workflow)
   * Local roles
   * Content rules
+  * Portlets
 
 In addition, certain aspects will mirror the original unless they are 
 explicitly set on the alias, at which point it will have its own version.
@@ -87,7 +88,6 @@ like this::
 
     <registry>
     
-        <!-- Configure initial settings -->
         <record name="collective.alias.interfaces.IAliasSettings.traversalTypes">
           <value purge="false">
               <element>MyType</element>
@@ -95,3 +95,14 @@ like this::
         </record>
     
     </registry>
+
+Known issues:
+-------------
+
+The following known issues exist:
+
+ * At the time of writing (Dexterity 1.0a2) it is not possible to create an
+   Archetypes reference (e.g. the standard "Related items" field on an
+   Archetypes content object, including Plone 3's default types) to an alias.
+   This is due to an incompatibility between Dexterity and the Archetypes
+   reference implementation.

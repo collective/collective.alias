@@ -84,31 +84,30 @@ Possible future functionality
         - set marker interface on source
         - register event handler
 
- [ ] Optionally allow traversal to children of target
-        - do not create fake catalog entries
-        - regular folder listings won't work
-        - allow certain things like RichDocument to work
+ [ ] Optionally mirror portlets
+        - do not allow portlet management at alias
+        - remove CONTEXT_ASSIGNMENT_KEY alias override
 
 Content class hierarchy
 -----------------------
 
-    Contained                       -- attributes, proxy
-    DefaultDublinCoreImpl           -- attributes + methods, proxy
-        PropertyManager             -- attributes + methods, proxy
-    PortalContent                   -- SearchableText, __call__(), implement!
-        DynamicType                 -- FTI methods, traversal hook, implement?
-        CMFCatalogAware             -- see below
-        SimpleItem                  -- base classes only, proxy
-            Item                    -- id, isPrincipaFolderish, proxy
-                Resource            -- ?
-                CopySource          -- copy support, implement!
-                Tabs                -- ?
-                Traversable         -- URL, traversal, implement!
-                Element             -- attributes + methods, proxy
-                Owned               -- Ownership, implement!
-                UndoSupport         -- Undo support, implement!
-            RoleManager             -- Permissions and roles, implement? [*]
-    CMFOrderedBTreeFolderBase       -- folder API, wraps, proxy
-        BTreeFolder2Base            -- folder API, wraps, proxy
-    CMFCatalogAware                 -- indexing operations, implement!
-    BrowserDefaultMixin             -- attributes + methods, proxy
+    Contained
+    DefaultDublinCoreImpl
+        PropertyManager
+    PortalContent
+        DynamicType
+        CMFCatalogAware
+        SimpleItem
+            Item
+                Resource
+                CopySource
+                Tabs
+                Traversable
+                Element
+                Owned
+                UndoSupport
+            RoleManager
+    CMFOrderedBTreeFolderBase
+        BTreeFolder2Base
+    CMFCatalogAware
+    BrowserDefaultMixin

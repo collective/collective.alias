@@ -29,6 +29,7 @@ setup(name='collective.alias',
           'collective.autopermission',
           'collective.testcaselayer',
           'plone.app.dexterity',
+          'plone.app.registry>=1.0b1',
           'rwproperty',
       ],
       entry_points="""

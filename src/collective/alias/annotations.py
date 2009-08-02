@@ -1,4 +1,5 @@
 from persistent.list import PersistentList
+
 from BTrees.OIBTree import OIBTree
 from BTrees.OOBTree import OOBTree
 
@@ -15,6 +16,7 @@ from collective.alias.interfaces import IAlias
 
 from plone.folder.default import DefaultOrdering
 from plone.contentrules.engine.assignments import KEY as CONTENTRULES_KEY
+from plone.portlets.constants import CONTEXT_ASSIGNMENT_KEY
 
 _marker = object()
 
@@ -93,3 +95,4 @@ def initializeAnnotations(obj, event):
     annotations.setdefault(DefaultOrdering.ORDER_KEY, PersistentList())
     annotations.setdefault(DefaultOrdering.POS_KEY, OIBTree())
     annotations.setdefault(CONTENTRULES_KEY, None)
+    annotations.setdefault(CONTEXT_ASSIGNMENT_KEY, OOBTree())
