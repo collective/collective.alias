@@ -1,5 +1,6 @@
 import logging
 import types
+import new
 
 from persistent.mapping import PersistentMapping
 from rwproperty import getproperty, setproperty
@@ -110,7 +111,7 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
         
         # Ensure that the alias gets its own workflow history
         self.workflow_history = PersistentMapping()
-        
+     
     #
     # Delegating methods
     #
@@ -245,16 +246,17 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
         """/me whistles and looks to the sky whilst walking slowly backwards,
         hoping no-one noticed what I just did
         """
+        
+        klass = getattr(self, '_v_class', None)
+        if klass is not None:
+            return klass
+        
         aliased = self._target
         if aliased is None:
             return Alias
-        else:
-            # We need this for super() and friends to work
-            
-            # XXX: this is mega evil. Cache it at least.
-            class Alias_(Alias, aq_base(aliased).__class__):
-                pass
-            return Alias_
+        
+        self._v_class = klass = new.classobj('Alias', (Alias, aq_base(aliased).__class__), {})
+        return klass
     
     # Delegate anything else that we can via a __getattr__ hook
     
