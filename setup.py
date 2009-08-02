@@ -29,8 +29,10 @@ setup(name='collective.alias',
           'collective.autopermission',
           'collective.testcaselayer',
           'plone.app.dexterity',
-          'plone.app.registry>=1.0b1',
+          'plone.app.registry >= 1.0b1',
           'rwproperty',
+          'plone.contentrules',
+          'plone.portlets',
       ],
       entry_points="""
       [z3c.autoinclude.plugin]
