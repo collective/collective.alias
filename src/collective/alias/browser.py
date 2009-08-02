@@ -4,6 +4,7 @@ from five import grok
 from plone.directives import dexterity
 
 from zope.component import getUtility
+from zope.component import getMultiAdapter
 
 from zope.app.container.interfaces import INameChooser
 from plone.dexterity.interfaces import IDexterityFTI
@@ -11,7 +12,13 @@ from plone.dexterity.interfaces import IDexterityFTI
 from Acquisition import aq_inner
 from AccessControl import Unauthorized
 
+from plone.app.layout.viewlets.interfaces import IContentViews
+
+from plone.registry.interfaces import IRegistry
+
 from collective.alias.interfaces import IAlias
+from collective.alias.interfaces import IAliasSettings
+
 from collective.alias import MessageFactory as _
 
 class Add(dexterity.AddForm):
@@ -87,3 +94,47 @@ class Edit(dexterity.EditForm):
         if '_aliasTarget' in self.fields:
             del self.fields['_aliasTarget']
 
+class ContentViews(grok.Viewlet):
+    """Override the content views (edit tabs) viewlet to ensure that we only
+    get the "edit" action for the alias.
+    """
+    
+    grok.context(IAlias)
+    grok.require('zope2.View')
+    grok.name('plone.contentviews')
+    grok.viewletmanager(IContentViews)
+    
+    def update(self):
+        
+        context = aq_inner(self.context)
+        ploneview = getMultiAdapter((context, self.request,), name=u"plone")
+        
+        settings = getUtility(IRegistry).forInterface(IAliasSettings)
+        allowedActions = settings.aliasActions
+        
+        self.showEditableBorder = ploneview.showEditableBorder()
+        actions = ploneview.prepareObjectTabs()
+        
+        contextURL = context.absolute_url()
+        
+        requestURL = self.request['ACTUAL_URL']
+        requestURLPath = requestURL[len(contextURL):]
+        if requestURLPath.startswith('/'):
+            requestURLPath = requestURLPath[1:]
+        
+        is_edit = requestURLPath in ('edit', '@@edit',)
+        
+        self.actions = []
+        
+        for a in actions:
+            if a['id'] not in allowedActions:
+                continue
+            
+            if a['id'] == 'edit':
+                a['url'] = "%s/@@edit" % contextURL
+                a['selected'] = is_edit
+            else:
+                if is_edit:
+                    a['selected'] = False
+        
+            self.actions.append(a)

@@ -51,6 +51,14 @@ class IAliasSettings(form.Schema):
             default=[],
             value_type=schema.Choice(vocabulary="collective.alias.PortalTypes"),
         )
+    
+    aliasActions = schema.Set(
+            title=_(u"Alias actions"),
+            description=_(u"Ids of actions that are allowed on aliases"),
+            required=True,
+            default=set(),
+            value_type=schema.ASCIILine(),
+        )
 
 
 class IHasAlias(Interface):

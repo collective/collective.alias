@@ -4,9 +4,21 @@
     <records interface="collective.alias.interfaces.IAliasSettings" />
     
     <!-- Configure initial settings -->
+    
     <record name="collective.alias.interfaces.IAliasSettings.traversalTypes">
       <value>
           <element>Topic</element>
+      </value>
+    </record>
+    
+    <record name="collective.alias.interfaces.IAliasSettings.aliasActions">
+      <value>
+          <element>view</element>
+          <element>edit</element>
+          <element>folderContents</element>
+          <element>syndication</element>
+          <element>contentrules</element>
+          <element>local_roles</element>
       </value>
     </record>
     
