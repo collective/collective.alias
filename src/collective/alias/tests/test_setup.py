@@ -25,7 +25,7 @@ class TestSetup(PloneTestCase):
         reg = getUtility(IRegistry)
         records = reg.forInterface(IAliasSettings)
         self.failUnless('Topic' in records.traversalTypes)
-        self.failUnless('view' in records.allowedActions)
+        self.failUnless('view' in records.aliasActions)
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
