@@ -29,6 +29,8 @@ from plone.dexterity.interfaces import IDexterityContent
 
 from plone.folder.ordered import CMFOrderedBTreeFolderBase
 
+from plone.app.iterate.interfaces import IIterateAware
+
 from Acquisition import aq_base, aq_inner, aq_parent
 
 from Products.CMFCore.PortalContent import PortalContent
@@ -81,7 +83,7 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
         
         # Add the interfaces provided by the target, but take away
         # IHasAlias if set
-        provided += providedBy(target) - IHasAlias
+        provided += providedBy(target) - IHasAlias - IIterateAware
         
         inst._v__providedBy__ = inst._p_mtime, alias_provides, provided
         return provided
