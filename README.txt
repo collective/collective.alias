@@ -24,6 +24,36 @@ These aspects include:
   * Display template (set via the `display` menu)
   * Portlets
 
+Installation
+------------
+
+collective.alias uses Dexterity. See http://plone.org/products/dexterity for
+more information.
+
+To use the product in your own build, either depend on it in a setup.py file,
+or add it to your buildout's `eggs` listing as normal.
+
+In either case, you probably want to use Dexterity's Known Good Set of
+packages to minimise the risk of package version conflicts. For example::
+
+  [buildout]
+  ...
+  extends =
+      ...
+      http://good-py.appspot.com/release/dexterity/1.0a2
+
+  ...
+  
+  [instance]
+  eggs =
+      Plone
+      collective.alias
+      ...
+
+Refer to http://plone.org/products/dexterity to find the latest release of
+the Dexterity KGS. collective.alias is tested with the 1.0 series of Dexterity
+releases.
+
 Pasting aliases
 ---------------
 
@@ -45,3 +75,23 @@ or object access. They will *not* normally show up in folder listings, nor
 will they be indexed in the `portal_catalog` as separate items. This mode is
 useful for Collections and other types of content where child objects are
 integral to the object.
+
+The "allow traversal" flag is set automatically based on the portal_type of
+the original content object, though it can be modified from the alias edit
+form.
+
+The list of types that allow traversal is stored in the configuration registry
+and can e edited from the `Configuration registry` control panel. If you want
+to add a custom type to this list with GenericSetup, use a `registry.xml` file
+like this::
+
+    <registry>
+    
+        <!-- Configure initial settings -->
+        <record name="collective.alias.interfaces.IAliasSettings.traversalTypes">
+          <value purge="false">
+              <element>MyType</element>
+          </value>
+        </record>
+    
+    </registry>
