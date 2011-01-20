@@ -106,3 +106,17 @@ The following known issues exist:
    Archetypes content object, including Plone 3's default types) to an alias.
    This is due to an incompatibility between Dexterity and the Archetypes
    reference implementation.
+
+To do:
+------
+
+ * It's not possible to edit an Alias. 
+   Changes in Plone [1_, 2_] require a new way to generate the object tabs.
+   The way this issue was addressed in Products.Collage [3_] doesn't work here,
+   because `viewlet = provider.__getitem__("plone.contentviews")` returns a
+   collective.alias.browser.ContentViews object, which doesn't have the
+   prepareObjectTabs method.
+
+.. _1: http://dev.plone.org/plone/changeset/33984
+.. _2: http://dev.plone.org/plone/changeset/33984
+.. _3: http://dev.plone.org/collective/changeset/111545/Products.Collage/trunk/Products/Collage/browser

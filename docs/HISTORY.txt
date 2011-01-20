@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.0-SNAPSHOT (unreleased)
+-------------------------
+
+* Fix "AttributeError: 'Plone' object has no attribute 'prepareObjectTabs'" in
+  Plone 4, disabling content views altogether.
+  (Most notably, disabling the option to edit an Alias).
+  [khink]
+
 1.0a1 - 2009-08-02
 ------------------
 

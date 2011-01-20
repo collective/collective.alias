@@ -113,7 +113,7 @@ class ContentViews(grok.Viewlet):
         allowedActions = settings.aliasActions
         
         self.showEditableBorder = ploneview.showEditableBorder()
-        actions = ploneview.prepareObjectTabs()
+        actions = [] #ploneview.prepareObjectTabs()
         
         contextURL = context.absolute_url()
         
