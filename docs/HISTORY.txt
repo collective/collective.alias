@@ -4,7 +4,7 @@ Changelog
 1.0-SNAPSHOT (unreleased)
 -------------------------
 
-* Grok 2.1 compatibility.
+* grok.CodeView doesn't exist anymore in recent five.grok, replaced by grok.View.
 
 * Fix "AttributeError: 'Plone' object has no attribute 'prepareObjectTabs'" in
   Plone 4, disabling content views altogether.
