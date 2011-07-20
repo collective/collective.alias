@@ -23,9 +23,9 @@ def pasteAsAlias(context, cb_copy_data=None, request=None):
     """Paste the clipboard contents as an alias. Either pass the data, or a
     valid request with the __cp key.
     """
-        
+
     cp = None
-    
+
     if cb_copy_data is not None:
         cp = cb_copy_data
     elif request and request.has_key('__cp'):
@@ -43,10 +43,10 @@ def pasteAsAlias(context, cb_copy_data=None, request=None):
 
     oblist = []
     app = context.getPhysicalRoot()
-    
+
     failed = []
     success = []
-    
+
     for mdata in cp[1]:
         m = OFS.Moniker.loadMoniker(mdata)
         try:
@@ -54,37 +54,37 @@ def pasteAsAlias(context, cb_copy_data=None, request=None):
         except:
             raise ValueError("Objects not found in %s" % app)
         oblist.append(ob)
-    
+
     intids = getUtility(IIntIds)
-    
+
     for ob in oblist:
         relation = RelationValue(intids.getId(ob))
         alias = createContent('collective.alias', _aliasTarget=relation)
-        
+
         notify(ObjectCreatedEvent(alias))
-        
+
         name = INameChooser(context).chooseName(ob.getId(), alias)
         alias.id = name
-        
+
         new_name = context._setObject(name, alias)
-        
+
         # XXX: When we move to CMF 2.2, an event handler will take care of this
         new_object = context._getOb(new_name)
         new_object.notifyWorkflowCreated()
 
     return ' '.join(success) + ' '.join(failed)
 
-class PasteAsAlias(grok.CodeView):
+class PasteAsAlias(grok.View):
     """View used as an action for pasting the clipboard contents as aliases
     """
     grok.context(IObjectManager)
     grok.name('paste-alias')
     grok.require('collective.alias.AddAlias')
-    
+
     def update(self):
         message = pasteAsAlias(context=aq_inner(self.context), request=self.request)
         self.request.response.redirect(self.context.absolute_url())
-    
+
     def render(self):
         return ''
 
