@@ -25,6 +25,15 @@ These aspects include:
   * Display template (set via the `display` menu)
   * Portlets
 
+Upgrade from Plone 3 to Plone 4
+-------------------------------
+
+With Plone 4, the UID index is converted to a UUIDIndex. The plone migration will
+crash because of duplicated UID in the catalog.
+So you need to fix your catalog before executing the plone migration,
+go to portal_setup, Upgrades tab, choose collective.alias and 
+execute the upgrade step 1 to 2.
+
 Installation
 ------------
 

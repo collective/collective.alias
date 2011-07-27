@@ -26,6 +26,7 @@ from z3c.relationfield.interfaces import IRelationValue
 from z3c.relationfield.relation import RelationValue
 
 from plone.dexterity.interfaces import IDexterityContent
+from plone.uuid.interfaces import IAttributeUUID, IUUIDAware
 
 from plone.folder.ordered import CMFOrderedBTreeFolderBase
 
@@ -90,7 +91,7 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
 
 
 class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained):
-    grok.implements(IAlias, IDexterityContent, IHasRelations)
+    grok.implements(IAlias, IDexterityContent, IHasRelations, IUUIDAware, IAttributeUUID)
     
     __providedBy__ = DelegatingSpecification()
     _alias_portal_type = None

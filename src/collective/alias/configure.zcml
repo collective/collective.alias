@@ -22,5 +22,13 @@
         />
     
     <grok:grok package="." />
-    
+
+    <genericsetup:upgradeStep
+        title="Add uuid to Alias objects and recatalog"
+        description="This fixes duplicated UID with UUIDIndex on Plone 4"
+        source="1"
+        destination="2"
+        handler=".upgrade.add_uuid"
+        profile="collective.alias:default"/>
+
 </configure>
