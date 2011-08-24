@@ -8,6 +8,11 @@
 
     <includeDependencies package="." />
 
+	  <browser:resourceDirectory
+	      name="collective.alias"
+	      directory="static"
+	        />
+
     <permission
         id="collective.alias.AddAlias"
         title="collective.alias: Add Alias"
@@ -20,7 +25,7 @@
         directory="profiles/default"
         provides="Products.GenericSetup.interfaces.EXTENSION"
         />
-    
+
     <grok:grok package="." />
 
     <genericsetup:upgradeStep

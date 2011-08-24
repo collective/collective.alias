@@ -4,6 +4,9 @@ Changelog
 1.0-SNAPSHOT (unreleased)
 -------------------------
 
+* Fixed type icon display.
+  [thomasdesvenain]
+
 * Add uuid to Alias objects and recatalog.
   This fixes duplicated UID with UUIDIndex on Plone 4.
   [vincentfretin]
