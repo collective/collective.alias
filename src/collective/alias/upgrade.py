@@ -14,3 +14,7 @@ def add_uuid(context):
                 obj.unrestrictedTraverse(('talkback', comment_id)).unindexObject()
         except AttributeError: # no talkback
             pass
+
+def upgrade_actions(context):
+    context.runImportStepFromProfile('profile-collective.alias:default',
+                                     'actions')

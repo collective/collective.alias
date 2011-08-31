@@ -28,12 +28,24 @@
 
     <grok:grok package="." />
 
+    <genericsetup:upgradeSteps
+        source="1"
+        destination="2"
+        profile="collective.alias:default">
+
     <genericsetup:upgradeStep
         title="Add uuid to Alias objects and recatalog"
         description="This fixes duplicated UID with UUIDIndex on Plone 4"
-        source="1"
-        destination="2"
         handler=".upgrade.add_uuid"
-        profile="collective.alias:default"/>
+            />
+
+    <genericsetup:upgradeStep
+        title="Upgrade collective.alias actions."
+        description="Add action to folder_buttons. Use icon_expr"
+        handler=".upgrade.upgrade_actions"
+            />
+
+
+    </genericsetup:upgradeSteps>
 
 </configure>

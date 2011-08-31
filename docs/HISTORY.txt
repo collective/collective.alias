@@ -4,7 +4,10 @@ Changelog
 1.0-SNAPSHOT (unreleased)
 -------------------------
 
-* Fixed type icon display.
+* Add 'paste as alias' action to folder buttons.
+  [thomasdesvenain]
+
+* Fixed type icon display. Use icon_expr.
   [thomasdesvenain]
 
 * Add uuid to Alias objects and recatalog.
