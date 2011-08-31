@@ -1,8 +1,11 @@
 Changelog
 =========
 
-1.0-SNAPSHOT (unreleased)
--------------------------
+1.1 (unreleased)
+----------------
+
+* Localized package + french translation.
+  [thomasdesvenain]
 
 * Add 'paste as alias' action to folder buttons.
   [thomasdesvenain]
