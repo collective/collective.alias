@@ -4,6 +4,13 @@ Changelog
 1.1 (unreleased)
 ----------------
 
+* The upgrade profile clears the relation catalog to fix issues with interfaces
+  that don't exist anymore.
+  /!\ If you have other dexterity content types with relations, you have to
+  write a script that notify an ObjectModifiedEvent for each instance to
+  reindex the relations.
+  [vincentfretin]
+
 * Localized package + french translation.
   [thomasdesvenain]
 
