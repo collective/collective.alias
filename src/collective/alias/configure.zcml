@@ -39,7 +39,7 @@
     <genericsetup:upgradeStep
         title="Recatalog zc.relation catalog"
         description="This fixes indexes were interfaces don't exist anymore"
-        handler=".upgrades.reindex_relations"
+        handler=".upgrade.reindex_relations"
         />
 
     <genericsetup:upgradeStep
