@@ -5,8 +5,7 @@
  <!-- Basic metadata -->
  <property name="title" i18n:translate="">Alias</property>
  <property name="description" i18n:translate="">An alias for another content item</property>
- <property name="content_icon">++resource++collective.alias/alias.gif</property>
- <property name="icon_expr">string:${portal_url}/++resource++collective.alias/alias.gif</property>
+  <property name="icon_expr">string:${portal_url}/++resource++collective.alias/alias.gif</property>
  <property name="allow_discussion">False</property>
  <property name="global_allow">True</property>
  <property name="filter_content_types">False</property>

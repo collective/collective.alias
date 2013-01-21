@@ -1,36 +1,37 @@
 Changelog
 =========
 
-1.2 (unreleased)
+1.2 - Unreleased
 ----------------
 
-- Nothing changed yet.
+- Adapt imports to Plone 4.3 compatibility
+  [saily]
 
 
-1.1 (2011-09-22)
+1.1 - 2011-09-22
 ----------------
 
-* The upgrade profile clear and rebuild the zc.relation catalog to fix issues
+- The upgrade profile clear and rebuild the zc.relation catalog to fix issues
   with interfaces that don't exist anymore.
   [vincentfretin]
 
-* Localized package + french translation.
+- Localized package + french translation.
   [thomasdesvenain]
 
-* Add 'paste as alias' action to folder buttons.
+- Add 'paste as alias' action to folder buttons.
   [thomasdesvenain]
 
-* Fixed type icon display. Use icon_expr.
+- Fixed type icon display. Use icon_expr.
   [thomasdesvenain]
 
-* Add uuid to Alias objects and recatalog.
+- Add uuid to Alias objects and recatalog.
   This fixes duplicated UID with UUIDIndex on Plone 4.
   [vincentfretin]
 
-* grok.CodeView doesn't exist anymore in recent five.grok, replaced by grok.View.
+- grok.CodeView doesn't exist anymore in recent five.grok, replaced by grok.View.
   [thomasdesvenain]
 
-* Fix "AttributeError: 'Plone' object has no attribute 'prepareObjectTabs'" in
+- Fix "AttributeError: 'Plone' object has no attribute 'prepareObjectTabs'" in
   Plone 4, disabling content views altogether.
   (Most notably, disabling the option to edit an Alias).
   [khink]
@@ -38,5 +39,5 @@ Changelog
 1.0a1 - 2009-08-02
 ------------------
 
-* Initial release
+- Initial release
 
