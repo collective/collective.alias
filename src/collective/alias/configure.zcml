@@ -10,6 +10,7 @@
     <i18n:registerTranslations directory="locales" />
 
     <includeDependencies package="." />
+    <include package="plone.app.relationfield" />
 
 	  <browser:resourceDirectory
 	      name="collective.alias"
