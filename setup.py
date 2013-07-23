@@ -32,6 +32,7 @@ setup(name='collective.alias',
           'plone.app.registry >= 1.0b1',
           'rwproperty',
           'plone.contentrules',
+          'plone.formwidget.contenttree',
           'plone.portlets',
       ],
       entry_points="""
