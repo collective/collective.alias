@@ -1,14 +1,14 @@
 from zope.interface import Interface
 from zope import schema
 
-from plone.directives import form
-
-from z3c.relationfield.schema import RelationChoice
 from plone.formwidget.contenttree import ObjPathSourceBinder
+from plone.supermodel import model
+from z3c.relationfield.schema import RelationChoice
 
 from collective.alias import MessageFactory as _
 
-class IAlias(form.Schema):
+
+class IAlias(model.Schema):
     """Schema interface. Note that the alias will also appear to provide the
     schema of the aliased object.
     """
@@ -40,7 +40,7 @@ class IAlias(form.Schema):
         )
 
 
-class IAliasSettings(form.Schema):
+class IAliasSettings(model.Schema):
     """Configuration settings used in registry.xml
     """
     
