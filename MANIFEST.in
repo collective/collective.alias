@@ -1,0 +1,5 @@
+recursive-include astride *
+recursive-include docs *
+include *.txt
+global-exclude *.pyc
+
