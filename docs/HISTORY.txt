@@ -4,11 +4,9 @@ Changelog
 1.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
-
-1.2 (2013-09-18)
-----------------
+- Added MANIFEST.in
+  Release 1.2 install failing.
+  [thomasdesvenain]
 
 - Adapt imports to Plone 4.3 compatibility
   [saily]
