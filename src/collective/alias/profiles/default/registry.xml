@@ -1,16 +1,16 @@
 <registry>
-    
+
     <!-- Register the records -->
     <records interface="collective.alias.interfaces.IAliasSettings" />
-    
+
     <!-- Configure initial settings -->
-    
+
     <record name="collective.alias.interfaces.IAliasSettings.traversalTypes">
       <value>
-          <element>Topic</element>
+          <element>Collection</element>
       </value>
     </record>
-    
+
     <record name="collective.alias.interfaces.IAliasSettings.aliasActions">
       <value>
           <element>view</element>
@@ -21,5 +21,5 @@
           <element>local_roles</element>
       </value>
     </record>
-    
+
 </registry>
