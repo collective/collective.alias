@@ -40,6 +40,15 @@ from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from collective.alias.interfaces import IAlias
 from collective.alias.interfaces import IHasAlias
 
+import pkg_resources
+
+try:
+    pkg_resources.get_distribution('plone.multilingual')
+except pkg_resources.DistributionNotFound:
+    ITranslatable = None
+else:
+    from plone.multilingual.interfaces import ITranslatable
+
 _marker = object()
 
 logger = logging.getLogger('collective.alias')
@@ -85,6 +94,9 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
         # Add the interfaces provided by the target, but take away
         # IHasAlias if set
         provided += providedBy(target) - IHasAlias - IIterateAware
+
+        if ITranslatable:
+            provided -= ITranslatable
 
         inst._v__providedBy__ = inst._p_mtime, alias_provides, provided
         return provided

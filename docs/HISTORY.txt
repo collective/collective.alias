@@ -4,13 +4,14 @@ Changelog
 1.2.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Remove plone.multilingual.interfaces.ITranslatable from Aliases.
+  [jaroel]
 
 1.2.4 (2013-10-22)
 ------------------
 
-- Nothing changed yet.
+- Use Collection instead of Topic
+  [jaroel]
 
 
 1.2.3 (2013-09-25)
