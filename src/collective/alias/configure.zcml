@@ -7,35 +7,35 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.alias">
 
-    <i18n:registerTranslations directory="locales" />
+  <i18n:registerTranslations directory="locales" />
 
-    <includeDependencies package="." />
-    <include package="plone.app.relationfield" />
+  <includeDependencies package="." />
+  <include package="plone.app.relationfield" />
 
-	  <browser:resourceDirectory
-	      name="collective.alias"
-	      directory="static"
-	        />
+  <browser:resourceDirectory
+      name="collective.alias"
+      directory="static"
+      />
 
-    <permission
-        id="collective.alias.AddAlias"
-        title="collective.alias: Add Alias"
-        />
+  <permission
+      id="collective.alias.AddAlias"
+      title="collective.alias: Add Alias"
+      />
 
-    <genericsetup:registerProfile
-        name="default"
-        title="Content alias"
-        description="Adds the ability to register content aliases"
-        directory="profiles/default"
-        provides="Products.GenericSetup.interfaces.EXTENSION"
-        />
+  <genericsetup:registerProfile
+      name="default"
+      title="Content alias"
+      description="Adds the ability to register content aliases"
+      directory="profiles/default"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
 
-    <grok:grok package="." />
+  <grok:grok package="." />
 
-    <genericsetup:upgradeSteps
-        source="1"
-        destination="2"
-        profile="collective.alias:default">
+  <genericsetup:upgradeSteps
+      source="1"
+      destination="2"
+      profile="collective.alias:default">
 
     <genericsetup:upgradeStep
         title="Recatalog zc.relation catalog"
@@ -47,15 +47,14 @@
         title="Add uuid to Alias objects and recatalog"
         description="This fixes duplicated UID with UUIDIndex on Plone 4"
         handler=".upgrade.add_uuid"
-            />
+        />
 
     <genericsetup:upgradeStep
         title="Upgrade collective.alias actions."
         description="Add action to folder_buttons. Use icon_expr"
         handler=".upgrade.upgrade_actions"
-            />
+        />
 
-
-    </genericsetup:upgradeSteps>
+  </genericsetup:upgradeSteps>
 
 </configure>
