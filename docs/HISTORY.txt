@@ -4,7 +4,9 @@ Changelog
 1.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Modify available_expr of object_buttons/paste_alias action to not crash
+  if the user doesn't have the permission to view the parent.
+  [vincentfretin]
 
 
 1.3 (2013-11-04)

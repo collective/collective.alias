@@ -57,4 +57,17 @@
 
   </genericsetup:upgradeSteps>
 
+  <genericsetup:upgradeSteps
+      source="2"
+      destination="3"
+      profile="collective.alias:default">
+
+    <genericsetup:upgradeStep
+        title="Upgrade collective.alias actions."
+        description="Modify available_expr of object_buttons/paste_alias action."
+        handler=".upgrade.upgrade_actions"
+        />
+
+  </genericsetup:upgradeSteps>
+
 </configure>

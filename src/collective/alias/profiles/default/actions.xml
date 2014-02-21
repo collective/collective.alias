@@ -6,7 +6,7 @@
         <property name="description" i18n:translate="">Create an alias of the data on the clipboard</property>
         <property name="url_expr">string:@@paste-alias</property>
         <property name="icon_expr">string:${portal_url}/++resource++collective.alias/alias.gif</property>
-        <property name="available_expr">folder/cb_dataValid</property>
+        <property name="available_expr">folder/cb_dataValid|nothing</property>
         <property name="permissions">
             <element value="collective.alias: Add Alias"/>
         </property>
