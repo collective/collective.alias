@@ -4,6 +4,9 @@ Changelog
 1.4 (unreleased)
 ----------------
 
+- Fix tests
+  [jaroel]
+
 - Update dev to Plone 4.3 and make tests runnable.
   [jaroel]
 
