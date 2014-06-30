@@ -27,7 +27,6 @@ setup(name='collective.alias',
       install_requires=[
           'setuptools',
           'collective.autopermission',
-          'collective.testcaselayer',
           'plone.app.dexterity [relations]',
           'plone.app.registry >= 1.0b1',
           'rwproperty',
@@ -35,6 +34,12 @@ setup(name='collective.alias',
           'plone.directives.dexterity',
           'plone.portlets',
       ],
+      extras_require={
+          'test': [
+              'collective.testcaselayer',
+              'Products.PloneTestCase',
+          ]
+      },
       entry_points="""
       [z3c.autoinclude.plugin]
       target = plone
