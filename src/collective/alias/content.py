@@ -107,6 +107,7 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
 
     __providedBy__ = DelegatingSpecification()
     _alias_portal_type = None
+    _alias_version_id = None
     _alias_properties = None
 
     cmf_uid = None
@@ -210,6 +211,19 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
     def portal_type(self, value):
         self._alias_portal_type = value
 
+    # version_id
+
+    @getproperty
+    def version_id(self):
+        aliased = self._target
+        if aliased is None:
+            return self._alias_version_id
+        return aq_inner(aliased).version_id
+
+    @setproperty
+    def version_id(self, value):
+        self._alias_version_id = value
+
     # Hopelessly, Archetypes accesses obj.__annotations__ directly, instead
     # of using an IAnnotations adapter. Delegate to our own adapter, which
     # uses __alias_annotations__ as the "real" dictionary
@@ -255,6 +269,17 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
         aq_inner(aliased).talkback = value
 
     # Evil hacks
+
+    @property
+    def portal_repository(self):
+        # Hack to skip p.a.versioningbehavior
+        class AliasRepository(object):
+            def isVersionable(self, context):
+                return False
+
+            def supportsPolicy(obj, policy):
+                return False
+        return AliasRepository()
 
     @property
     def __class__(self):
