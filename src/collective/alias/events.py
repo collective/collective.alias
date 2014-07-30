@@ -1,6 +1,7 @@
 import logging
 
 from five import grok
+from plone.uuid.interfaces import ATTRIBUTE_NAME, IUUIDGenerator, IUUID
 
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
@@ -34,6 +35,23 @@ from collective.alias.interfaces import IAliasSettings
 from zope.event import notify
 
 logger = logging.getLogger('collective.alias')
+
+# Ensure that the alias has its own UUID
+
+@grok.subscribe(IAlias, IObjectCreatedEvent)
+def addAttributeUUID(obj, event):
+    if IUUID(obj) != IUUID(obj._aliasTarget.to_object):
+        return
+
+    generator = queryUtility(IUUIDGenerator)
+    if generator is None:
+        return
+
+    uuid = generator()
+    if not uuid:
+        return
+
+    setattr(obj, ATTRIBUTE_NAME, uuid)
 
 # Event delegation
 
