@@ -4,43 +4,32 @@ import new
 
 from persistent.mapping import PersistentMapping
 from rwproperty import getproperty, setproperty
-
 from five import grok
-
+from zope.globalrequest import getRequest
 from zope.interface.declarations import implementedBy
 from zope.interface.declarations import providedBy
 from zope.interface.declarations import getObjectSpecification
 from zope.interface.declarations import ObjectSpecificationDescriptor
-
 from zope.component import queryUtility
 from zope.annotation.interfaces import IAnnotations
-
 from zope.app.container.contained import Contained
-
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
-
 from zope.intid.interfaces import IIntIds
-
 from z3c.relationfield.interfaces import IHasRelations
 from z3c.relationfield.interfaces import IRelationValue
 from z3c.relationfield.relation import RelationValue
-
 from plone.dexterity.interfaces import IDexterityContent
 from plone.uuid.interfaces import IAttributeUUID, IUUIDAware
-
 from plone.folder.ordered import CMFOrderedBTreeFolderBase
-
 from plone.app.iterate.interfaces import IIterateAware
-
 from Acquisition import aq_base, aq_inner, aq_parent
-
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+import pkg_resources
 
 from collective.alias.interfaces import IAlias
 from collective.alias.interfaces import IHasAlias
 
-import pkg_resources
 
 try:
     pkg_resources.get_distribution('plone.multilingual')
@@ -172,8 +161,26 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
 
     # Support for _aliasTraversal
 
+    @property
+    def _restrictedAliasTraversal(self):
+        # Here we do everything to limit alias traversal only for safe
+        # conditions:
+        if not self._aliasTraversal:
+            return False
+
+        # Posts are considered unsafe
+        request = getRequest()
+        if getattr(request, 'method', None) != 'GET':
+            return False
+
+        # And the same goes for all requests mutating the alias
+        if getattr(self, 'p_changed', None):
+            return False
+
+        return True
+
     def _getOb(self, id, default=_marker):
-        if self._aliasTraversal:
+        if self._restrictedAliasTraversal:
             aliased = self._target
             if aliased is not None:
                 obj = aliased._getOb(id, default)
@@ -185,14 +192,14 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
         return CMFOrderedBTreeFolderBase._getOb(self, id, default)
 
     def objectIds(self, spec=None, ordered=True):
-        if self._aliasTraversal:
+        if self._restrictedAliasTraversal:
             aliased = self._target
             if aliased is not None:
                 return aliased.objectIds(spec)
         return CMFOrderedBTreeFolderBase.objectIds(self, spec, ordered)
 
     def __getitem__(self, key):
-        if self._aliasTraversal:
+        if self._restrictedAliasTraversal:
             aliased = self._target
             if aliased is not None:
                 return aliased.__getitem__(key)
