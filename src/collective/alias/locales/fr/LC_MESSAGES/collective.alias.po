@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: aws.pdfbook\n"
-"POT-Creation-Date: 2010-05-05 15:03+0000\n"
+"POT-Creation-Date: 2014-07-30 02:51+0000\n"
 "PO-Revision-Date: 2010-05-11 15:30+0000\n"
 "Last-Translator: Gilles Lenfant <gilles.lenfant@alterway.fr>\n"
 "Language-Team: Alterway <support@alterway.fr>\n"
@@ -14,5 +14,67 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: aws.pdfbook\n"
 
+#: collective/alias/profiles/default/types/collective.alias.xml
+msgid "Alias"
+msgstr ""
+
+#: collective/alias/interfaces.py:56
+msgid "Alias actions"
+msgstr ""
+
+#: collective/alias/interfaces.py:17
+msgid "Aliased object"
+msgstr ""
+
+#: collective/alias/interfaces.py:31
+msgid "Allow traversal"
+msgstr ""
+
+#: collective/alias/profiles/default/types/collective.alias.xml
+msgid "An alias for another content item"
+msgstr ""
+
+#: collective/alias/interfaces.py:18
+msgid "Choose an object to alias"
+msgstr ""
+
+#: collective/alias/profiles/default/actions.xml
+msgid "Create an alias of the data on the clipboard"
+msgstr ""
+
+#: collective/alias/browser.py:77
+msgid "Edit alias"
+msgstr ""
+
+#: collective/alias/interfaces.py:57
+msgid "Ids of actions that are allowed on aliases"
+msgstr ""
+
+#: collective/alias/interfaces.py:32
+msgid "If selected, children of the aliased object will appear as children of the alias. Note that they will not be indexed in the catalog, and probably won't show up in folder listings. This option may be useful for e.g. Collections, where some information is stored in child objects."
+msgstr ""
+
+#: collective/alias/interfaces.py:25
+msgid "If you want your alias to have a different title than the aliased object, enter a title here."
+msgstr ""
+
+#: collective/alias/interfaces.py:49
+msgid "List of types which by default allow traversal"
+msgstr ""
+
+#: collective/alias/profiles/default/actionicons.xml
+msgid "Paste alias"
+msgstr ""
+
+#: collective/alias/profiles/default/actions.xml
 msgid "Paste as alias"
 msgstr "Coller comme alias"
+
+#: collective/alias/interfaces.py:24
+msgid "Title override"
+msgstr ""
+
+#: collective/alias/interfaces.py:48
+msgid "Traversal types"
+msgstr ""
+

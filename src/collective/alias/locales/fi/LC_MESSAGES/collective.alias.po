@@ -1,6 +1,3 @@
-# --- PLEASE EDIT THE LINES BELOW CORRECTLY ---
-# SOME DESCRIPTIVE TITLE.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -15,39 +12,39 @@ msgstr ""
 "Language-Code: en\n"
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
-"Domain: collective.alias\n"
+"Domain: DOMAIN\n"
 
 #: collective/alias/profiles/default/types/collective.alias.xml
 msgid "Alias"
-msgstr ""
+msgstr "Heijastus"
 
 #: collective/alias/interfaces.py:56
 msgid "Alias actions"
-msgstr ""
+msgstr "Heijastustoiminto"
 
 #: collective/alias/interfaces.py:17
 msgid "Aliased object"
-msgstr ""
+msgstr "Heijastettu sivu"
 
 #: collective/alias/interfaces.py:31
 msgid "Allow traversal"
-msgstr ""
+msgstr "Salli pääsy alkuperäisen sivun alasivuihin"
 
 #: collective/alias/profiles/default/types/collective.alias.xml
 msgid "An alias for another content item"
-msgstr ""
+msgstr "Toisen sivun sisältöä heijastava sivu"
 
 #: collective/alias/interfaces.py:18
 msgid "Choose an object to alias"
-msgstr ""
+msgstr "Valitse heijastuksen kohde"
 
 #: collective/alias/profiles/default/actions.xml
 msgid "Create an alias of the data on the clipboard"
-msgstr ""
+msgstr "Luo heijstus leikepöydän sisällöstä"
 
 #: collective/alias/browser.py:77
 msgid "Edit alias"
-msgstr ""
+msgstr "Muokkaa heijastusta"
 
 #: collective/alias/interfaces.py:57
 msgid "Ids of actions that are allowed on aliases"
@@ -55,27 +52,27 @@ msgstr ""
 
 #: collective/alias/interfaces.py:32
 msgid "If selected, children of the aliased object will appear as children of the alias. Note that they will not be indexed in the catalog, and probably won't show up in folder listings. This option may be useful for e.g. Collections, where some information is stored in child objects."
-msgstr ""
+msgstr "Kun tämä on valittu, heijastetun kansions sisältö näytetään myös heijastuksen sisältönä. Huomioi kuitenkin, ettei heijastuksen sisältö todennäköisesti silti näy heijastuksen kansiolistauksessa tai hakutuloksissa. Tämä saattaa auttaa kokoelmien heijastamisessa."
 
 #: collective/alias/interfaces.py:25
 msgid "If you want your alias to have a different title than the aliased object, enter a title here."
-msgstr ""
+msgstr "Jos haluat heijastuksella olevan eri otsikon kuin alkuperäisellä sisällöllä, syötä korvaava otsikko tähän."
 
 #: collective/alias/interfaces.py:49
 msgid "List of types which by default allow traversal"
-msgstr ""
+msgstr "Lista sisältötyypeistä, joiden heijasteissa sallitaan oletuksena pääsy myös kohteen alasivuihin"
 
 #: collective/alias/profiles/default/actionicons.xml
 msgid "Paste alias"
-msgstr ""
+msgstr "Liitä heijastuksena"
 
 #: collective/alias/profiles/default/actions.xml
 msgid "Paste as alias"
-msgstr ""
+msgstr "Liitä heijastuksena"
 
 #: collective/alias/interfaces.py:24
 msgid "Title override"
-msgstr ""
+msgstr "Otsikon ylikirjoitus"
 
 #: collective/alias/interfaces.py:48
 msgid "Traversal types"
