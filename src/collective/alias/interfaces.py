@@ -17,7 +17,7 @@ class IAlias(model.Schema):
             title=_(u"Aliased object"),
             description=_(u"Choose an object to alias"),
             required=True,
-            source=ObjPathSourceBinder({'is_default_page': (True, False,)}),
+            source=ObjPathSourceBinder(),
         )
     
     _aliasTitle = schema.TextLine(
