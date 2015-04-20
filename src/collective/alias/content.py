@@ -30,8 +30,6 @@ from plone.uuid.interfaces import IAttributeUUID, IUUIDAware
 
 from plone.folder.ordered import CMFOrderedBTreeFolderBase
 
-from plone.app.iterate.interfaces import IIterateAware
-
 from Acquisition import aq_base, aq_inner, aq_parent
 
 from Products.CMFCore.PortalContent import PortalContent
@@ -41,6 +39,14 @@ from collective.alias.interfaces import IAlias
 from collective.alias.interfaces import IHasAlias
 
 import pkg_resources
+
+try:
+    pkg_resources.get_distribution('plone.app.iterate')
+except pkg_resources.DistributionNotFound:
+    IIterateAware = None
+else:
+    from plone.app.iterate.interfaces import IIterateAware
+
 
 try:
     pkg_resources.get_distribution('plone.multilingual')
@@ -93,7 +99,10 @@ class DelegatingSpecification(ObjectSpecificationDescriptor):
 
         # Add the interfaces provided by the target, but take away
         # IHasAlias if set
-        provided += providedBy(target) - IHasAlias - IIterateAware
+        provided += providedBy(target) - IHasAlias
+
+        if IIterateAware:
+            provided -= IIterateAware
 
         if ITranslatable:
             provided -= ITranslatable
