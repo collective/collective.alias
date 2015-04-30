@@ -26,7 +26,6 @@ setup(name='collective.alias',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'collective.autopermission',
           'plone.app.dexterity [relations]',
           'plone.app.registry >= 1.0b1',
           'rwproperty',
