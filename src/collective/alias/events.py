@@ -13,9 +13,8 @@ from zope.lifecycleevent.interfaces import IObjectCreatedEvent
 
 from zope.lifecycleevent import ObjectModifiedEvent
 
-# XXX: Should move to zope.container in the future
-from zope.app.container.interfaces import IObjectAddedEvent
-from zope.app.container.interfaces import IObjectRemovedEvent
+from zope.container.interfaces import IObjectAddedEvent
+from zope.container.interfaces import IObjectRemovedEvent
 
 from OFS.interfaces import IObjectWillBeRemovedEvent
 

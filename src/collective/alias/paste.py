@@ -16,8 +16,7 @@ from zope.intid.interfaces import IIntIds
 
 from plone.dexterity.utils import createContent
 
-# XXX: Should move to zope.container in the future
-from zope.app.container.interfaces import INameChooser
+from zope.container.interfaces import INameChooser
 
 def pasteAsAlias(context, cb_copy_data=None, request=None):
     """Paste the clipboard contents as an alias. Either pass the data, or a

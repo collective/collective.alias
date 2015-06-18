@@ -15,7 +15,7 @@ from zope.interface.declarations import ObjectSpecificationDescriptor
 from zope.component import queryUtility
 from zope.annotation.interfaces import IAnnotations
 
-from zope.app.container.contained import Contained
+from zope.container.contained import Contained
 
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 
