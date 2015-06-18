@@ -4,7 +4,7 @@
         <object name="paste_alias" meta_type="CMF Action" i18n:domain="collective.alias">
         <property name="title" i18n:translate="">Paste as alias</property>
         <property name="description" i18n:translate="">Create an alias of the data on the clipboard</property>
-        <property name="url_expr">string:@@paste-alias</property>
+        <property name="url_expr">python:globals_view.getCurrentFolderUrl()+'/@@paste-alias?_authenticator='+context.restrictedTraverse("@@authenticator").token()</property>
         <property name="icon_expr">string:${portal_url}/++resource++collective.alias/alias.gif</property>
         <property name="available_expr">folder/cb_dataValid|nothing</property>
         <property name="permissions">
@@ -12,19 +12,5 @@
         </property>
         <property name="visible">True</property>
         </object>
-    </object>
-    <object name="folder_buttons">
-      <object name="paste_alias" meta_type="CMF Action" i18n:domain="collective.alias"
-              insert-after="paste">
-        <property name="title" i18n:translate="">Paste as alias</property>
-        <property name="description" i18n:translate="">Create an alias of the data on the clipboard</property>
-        <property name="url_expr">string:paste-alias:method</property>
-        <property name="icon_expr">string:${portal_url}/++resource++collective.alias/alias.gif</property>
-        <property name="available_expr">folder/cb_dataValid</property>
-        <property name="permissions">
-            <element value="collective.alias: Add Alias"/>
-        </property>
-        <property name="visible">True</property>
-      </object>
     </object>
 </object>
