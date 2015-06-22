@@ -7,6 +7,8 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.alias">
 
+  <five:registerPackage package="." />
+
   <i18n:registerTranslations directory="locales" />
 
   <includeDependencies package="." />
