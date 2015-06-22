@@ -4,6 +4,9 @@ Changelog
 1.4 (unreleased)
 ----------------
 
+- Add extenisons folder for uninstallation.
+  [bsuttor]
+
 - Fix tests
   [jaroel]
 
