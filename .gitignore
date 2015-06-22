@@ -3,3 +3,11 @@
 *.pyo
 *.mo
 dist
+.installed.cfg
+bin/
+develop-eggs/
+include/
+lib/
+parts/
+share/
+
