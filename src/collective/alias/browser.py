@@ -13,6 +13,7 @@ from Acquisition import aq_inner
 from AccessControl import Unauthorized
 
 # from plone.app.layout.viewlets.interfaces import IContentViews
+from plone.app.layout.viewlets.interfaces import IHtmlHead
 
 from plone.registry.interfaces import IRegistry
 
@@ -20,6 +21,7 @@ from collective.alias.interfaces import IAlias
 from collective.alias.interfaces import IAliasSettings
 
 from collective.alias import MessageFactory as _
+
 
 class Add(dexterity.AddForm):
     """Override the add form not to depend on the portal_type once the
@@ -93,6 +95,18 @@ class Edit(dexterity.EditForm):
         # Don't allow the alias to be edited - it causes all kinds of confusion
         if '_aliasTarget' in self.fields:
             del self.fields['_aliasTarget']
+
+
+class CanonicalViewlet(grok.Viewlet):
+    grok.name("collective.alias.CanonicalViewlet")
+    grok.context(IAlias)
+    grok.require('zope2.View')
+    grok.viewletmanager(IHtmlHead)
+
+    def update(self):
+        self.view.target_url = self.context._target.absolute_url()
+        self.view.is_canonical = self.context._aliasIsCanonical
+
 
 # class ContentViews(grok.Viewlet):
 #     """Override the content views (edit tabs) viewlet to ensure that we only

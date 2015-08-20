@@ -38,6 +38,13 @@ class IAlias(model.Schema):
         default=False,
     )
 
+    _aliasIsCanonical = schema.Bool(
+        title=_(u"Is canonical"),
+        description=_(u"If selected, a canonical meta tag will be present."),
+        required=True,
+        default=False,
+    )
+
 
 class IAliasSettings(model.Schema):
     """Configuration settings used in registry.xml
