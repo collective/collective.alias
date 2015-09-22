@@ -88,6 +88,13 @@ class Edit(dexterity.EditForm):
         trivial to override. Just ignore it. :)
         """
         pass
+
+    @property
+    def additionalSchemata(self):
+        """
+        Do not provide target behaviours.
+        """
+        return ()
     
     def updateFields(self):
         super(Edit, self).updateFields()
