@@ -26,7 +26,10 @@ from z3c.relationfield.interfaces import IRelationValue
 from z3c.relationfield.relation import RelationValue
 
 from plone.dexterity.interfaces import IDexterityContent
-from plone.uuid.interfaces import IAttributeUUID, IUUIDAware
+from plone.uuid.interfaces import (
+    IAttributeUUID, IUUIDAware,
+    ATTRIBUTE_NAME as UUID_ATTRIBUTE_NAME
+)
 
 from plone.folder.ordered import CMFOrderedBTreeFolderBase
 
@@ -294,6 +297,10 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
             name.endswith('_Permission')
         ):
             raise AttributeError(name)
+
+        # We should never get the UUID from the tracked object.
+        if name == UUID_ATTRIBUTE_NAME:
+            return super(Alias, self).__getattr__(name)
 
         aliased = self._target
 
