@@ -70,4 +70,19 @@
 
   </genericsetup:upgradeSteps>
 
+  <genericsetup:upgradeSteps
+      source="3"
+      destination="4"
+      profile="collective.alias:default">
+
+    <genericsetup:upgradeStep
+        title="Upgrade collective.alias repositorytool."
+        description="Fix collective.alias edit for Plone 5."
+        handler=".upgrade.upgrade_repositorytool"
+        />
+
+  </genericsetup:upgradeSteps>
+
+
+
 </configure>

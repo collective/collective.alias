@@ -40,3 +40,10 @@ def add_uuid(context):
 def upgrade_actions(context):
     context.runImportStepFromProfile('profile-collective.alias:default',
                                      'actions')
+
+
+def upgrade_repositorytool(context):
+    portal_diff = getToolByName(context, 'portal_diff')
+    portal_diff.setDiffForPortalType( 'collective.alias', {'any': "Compound Diff for Dexterity types"})
+    context.runImportStepFromProfile('profile-collective.alias:default',
+                                     'repositorytool')
