@@ -25,6 +25,9 @@ These aspects include:
   * Display template (set via the `display` menu)
   * Portlets
 
+The 2.0 version of collective.alias is compatible with Plone 5 only.
+See the latest 1.* version for Plone 4.
+
 Upgrade from Plone 3 to Plone 4
 -------------------------------
 
