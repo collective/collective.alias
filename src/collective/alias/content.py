@@ -257,25 +257,6 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
             return
         aq_inner(aliased).talkback = value
 
-    # Evil hacks
-
-    @property
-    def __class__(self):
-        """/me whistles and looks to the sky whilst walking slowly backwards,
-        hoping no-one noticed what I just did
-        """
-
-        klass = getattr(self, '_v_class', None)
-        if klass is not None:
-            return klass
-
-        aliased = self._target
-        if aliased is None:
-            return Alias
-
-        self._v_class = klass = new.classobj('Alias', (Alias, aq_base(aliased).__class__), {})
-        return klass
-
     # Delegate anything else that we can via a __getattr__ hook
 
     def __getattr__(self, name):
