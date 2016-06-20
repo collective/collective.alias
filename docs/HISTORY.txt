@@ -4,6 +4,9 @@ Changelog
 1.4 (unreleased)
 ----------------
 
+- Add pt_BR translations.
+  [rafaelbco]
+
 - Fix tests
   [jaroel]
 

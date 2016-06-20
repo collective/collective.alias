@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: collective.alias\n"
+"POT-Creation-Date: 2014-07-30 02:51+0000\n"
+"PO-Revision-Date: 2016-05-20 09:30 +0300\n"
+"Last-Translator: Rafael Oliveira <rafaelbco@gmail.com>\n"
+"Language-Team: Rafael Oliveira <rafaelbco@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Language-Code: pt_BR\n"
+"Language-Name: Português do Brasil\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: collective.alias\n"
+
+#: collective/alias/profiles/default/types/collective.alias.xml
+msgid "Alias"
+msgstr "Atalho"
+
+#: collective/alias/interfaces.py:56
+msgid "Alias actions"
+msgstr "Ações de atalho"
+
+#: collective/alias/interfaces.py:17
+msgid "Aliased object"
+msgstr "Origem do atalho"
+
+#: collective/alias/interfaces.py:31
+msgid "Allow traversal"
+msgstr "Permitir navegação ('traversal')"
+
+#: collective/alias/profiles/default/types/collective.alias.xml
+msgid "An alias for another content item"
+msgstr "Um atalho para outro item de conteúdo"
+
+#: collective/alias/interfaces.py:18
+msgid "Choose an object to alias"
+msgstr "Escolha um item para criar um atalho"
+
+#: collective/alias/profiles/default/actions.xml
+msgid "Create an alias of the data on the clipboard"
+msgstr "Criar um atalho do item na área de transferência"
+
+#: collective/alias/browser.py:77
+msgid "Edit alias"
+msgstr "Editar atalho"
+
+#: collective/alias/interfaces.py:57
+msgid "Ids of actions that are allowed on aliases"
+msgstr "IDs das ações permitidas em atalhos"
+
+#: collective/alias/interfaces.py:32
+msgid "If selected, children of the aliased object will appear as children of the alias. Note that they will not be indexed in the catalog, and probably won't show up in folder listings. This option may be useful for e.g. Collections, where some information is stored in child objects."
+msgstr "Se selecionada, filhos da origem do atalho aparecerão como filhos do atalho. Note que eles não serão indexados no catálogo e provavelmente não aparecerão nas listagens de pastas. Esta opção pode ser útil para Coleções, onde algumas informações são armazenadas em itens filhos."
+
+#: collective/alias/interfaces.py:25
+msgid "If you want your alias to have a different title than the aliased object, enter a title here."
+msgstr "Se quiser que o atalho tenha um título diferente da origem, entre com um título aqui."
+
+#: collective/alias/interfaces.py:49
+msgid "List of types which by default allow traversal"
+msgstr "Lista de tipos que por padrão permitem navegação ('traversal')"
+
+#: collective/alias/profiles/default/actionicons.xml
+msgid "Paste alias"
+msgstr "Colar atalho"
+
+#: collective/alias/profiles/default/actions.xml
+msgid "Paste as alias"
+msgstr "Colar como atalho"
+
+#: collective/alias/interfaces.py:24
+msgid "Title override"
+msgstr "Sobrescrever título"
+
+#: collective/alias/interfaces.py:48
+msgid "Traversal types"
+msgstr "Tipos navegáveis"
+
