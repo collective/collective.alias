@@ -116,6 +116,7 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
 
     _aliasTitle = ''
     _aliasTraversal = False
+    _aliasIsCanonical = False
 
     # to make debugging easier
     isAlias = True
