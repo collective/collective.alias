@@ -323,7 +323,8 @@ class Alias(CMFCatalogAware, CMFOrderedBTreeFolderBase, PortalContent, Contained
     @setproperty
     def _aliasTarget(self, value):
         if '_aliasTarget' in self.__dict__:
-            raise AttributeError("Cannot set _aliasTarget more than once")
+            return
+            # raise AttributeError("Cannot set _aliasTarget more than once")
 
         if not IRelationValue.providedBy(value):
             raise AttributeError("_aliasTarget must be an IRelationValue")
